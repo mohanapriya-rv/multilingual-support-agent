@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class ResponseFormatterService(
-    private val geminiService: GeminiService,
+    private val claudeService: ClaudeService,
     private val faqService: FAQService,
-    private val languageService: LanguageService  // NEW: For dynamic fallback messages
+    private val languageService: LanguageService
 ) {
     private val logger = LoggerFactory.getLogger(ResponseFormatterService::class.java)
 
@@ -28,7 +28,7 @@ class ResponseFormatterService(
             
             logger.info("Found ${relevantFaqs.size} relevant FAQs for category: $intentCategory")
             
-            geminiService.formatResponse(userMessage, detectedLanguage, data, conversationHistory, faqContext)
+            claudeService.formatResponse(userMessage, detectedLanguage, data, conversationHistory, faqContext)
         } catch (e: Exception) {
             logger.error("Response formatting failed: ${e.message}", e)
             getFallbackResponse(detectedLanguage, data)

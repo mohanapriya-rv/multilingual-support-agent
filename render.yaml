@@ -36,6 +36,8 @@ services:
           property: password
       - key: GEMINI_API_KEY
         sync: false
+      - key: CLAUDE_API_KEY
+        sync: false
       - key: CORS_ORIGINS
         value: "*"
     healthCheckPath: /api/health

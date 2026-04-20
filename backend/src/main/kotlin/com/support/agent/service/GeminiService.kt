@@ -19,7 +19,7 @@ class GeminiService(
     @Value("\${gemini.api-key:}")
     private lateinit var apiKey: String
 
-    @Value("\${gemini.model:gemini-1.5-flash}")
+    @Value("\${gemini.model:gemini-2.5-flash}")
     private lateinit var model: String
 
     @Value("\${gemini.timeout-seconds:30}")
