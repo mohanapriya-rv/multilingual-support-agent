@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nira Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-1: #0f0f1a;
+            --bg-2: #1a1a2e;
+            --bg-3: #252540;
+            --accent: #a855f7;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            min-height: 100vh;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+        }
+        .stat-card:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(168,85,247,0.3);
+        }
+        .chart-container {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+    </style>
+</head>
+<body class="text-white p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Nira Analytics Dashboard
+                </h1>
+                <p class="text-[var(--text-secondary)] mt-1">Real-time insights for your support agent</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="lastUpdated" class="text-sm text-[var(--text-secondary)]">Last updated: --</span>
+                <button onclick="refreshData()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Refresh
+                </button>
+                <a href="index.html" class="px-4 py-2 border border-purple-500/30 hover:bg-purple-500/10 rounded-lg text-sm font-medium">
+                    ← Back to Chat
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card rounded-2xl p-5 transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-[var(--text-secondary)] text-sm">Total Sessions</span>
+                </div>
+                <div id="totalConversations" class="text-3xl font-bold">--</div>
+            </div>
+
+            <div class="stat-card rounded-2xl p-5 transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </div>
+                    <span class="text-[var(--text-secondary)] text-sm">Total Queries</span>
+                </div>
+                <div id="totalQueries" class="text-3xl font-bold">--</div>
+                <div class="text-sm text-emerald-400 mt-1">
+                    <span id="todayQueries">--</span> today
+                </div>
+            </div>
+
+            <div class="stat-card rounded-2xl p-5 transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="text-[var(--text-secondary)] text-sm">Success Rate</span>
+                </div>
+                <div id="successRate" class="text-3xl font-bold text-emerald-400">--</div>
+            </div>
+
+            <div class="stat-card rounded-2xl p-5 transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <span class="text-[var(--text-secondary)] text-sm">Escalations</span>
+                </div>
+                <div id="escalations" class="text-3xl font-bold text-red-400">--</div>
+            </div>
+        </div>
+
+        <!-- Intent Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card rounded-2xl p-5">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xl">📋</span>
+                    <span class="text-[var(--text-secondary)] text-sm">KYC Queries</span>
+                </div>
+                <div id="kycQueries" class="text-2xl font-bold text-yellow-400">--</div>
+            </div>
+            <div class="stat-card rounded-2xl p-5">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xl">📈</span>
+                    <span class="text-[var(--text-secondary)] text-sm">Investment</span>
+                </div>
+                <div id="investmentQueries" class="text-2xl font-bold text-green-400">--</div>
+            </div>
+            <div class="stat-card rounded-2xl p-5">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xl">💳</span>
+                    <span class="text-[var(--text-secondary)] text-sm">Transactions</span>
+                </div>
+                <div id="transactionQueries" class="text-2xl font-bold text-blue-400">--</div>
+            </div>
+            <div class="stat-card rounded-2xl p-5">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xl">🎤</span>
+                    <span class="text-[var(--text-secondary)] text-sm">Voice vs Text</span>
+                </div>
+                <div id="inputTypeRatio" class="text-lg font-bold text-purple-400">--</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Language Distribution -->
+            <div class="chart-container rounded-2xl p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <span>🌐</span> Language Distribution
+                </h3>
+                <div class="h-64">
+                    <canvas id="languageChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Intent Distribution -->
+            <div class="chart-container rounded-2xl p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <span>🎯</span> Intent Categories
+                </h3>
+                <div class="h-64">
+                    <canvas id="intentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Language Breakdown Table -->
+        <div class="chart-container rounded-2xl p-6">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>📊</span> Language Breakdown
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/10">
+                            <th class="text-left py-3 px-4 text-[var(--text-secondary)] font-medium">Language</th>
+                            <th class="text-right py-3 px-4 text-[var(--text-secondary)] font-medium">Queries</th>
+                            <th class="text-right py-3 px-4 text-[var(--text-secondary)] font-medium">Percentage</th>
+                            <th class="text-left py-3 px-4 text-[var(--text-secondary)] font-medium">Distribution</th>
+                        </tr>
+                    </thead>
+                    <tbody id="languageTable">
+                        <tr><td colspan="4" class="py-4 text-center text-[var(--text-secondary)]">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let languageChart = null;
+        let intentChart = null;
+
+        const languageColors = {
+            english: '#3B82F6',
+            hindi: '#F59E0B',
+            tamil: '#10B981',
+            telugu: '#8B5CF6',
+            kannada: '#EC4899',
+            malayalam: '#06B6D4',
+            bengali: '#F97316',
+            marathi: '#84CC16',
+            gujarati: '#EF4444',
+            punjabi: '#6366F1'
+        };
+
+        const languageNames = {
+            english: '🇬🇧 English',
+            hindi: '🇮🇳 Hindi',
+            tamil: '🇮🇳 Tamil',
+            telugu: '🇮🇳 Telugu',
+            kannada: '🇮🇳 Kannada',
+            malayalam: '🇮🇳 Malayalam',
+            bengali: '🇮🇳 Bengali',
+            marathi: '🇮🇳 Marathi',
+            gujarati: '🇮🇳 Gujarati',
+            punjabi: '🇮🇳 Punjabi'
+        };
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch(`${API_BASE}/analytics/dashboard`);
+                const data = await response.json();
+                updateDashboard(data);
+            } catch (error) {
+                console.error('Failed to fetch dashboard data:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            // Update stats
+            document.getElementById('totalConversations').textContent = data.totalConversations || 0;
+            document.getElementById('totalQueries').textContent = data.totalQueries || 0;
+            document.getElementById('todayQueries').textContent = data.todayQueries || 0;
+            document.getElementById('successRate').textContent = (data.successRate || 0).toFixed(1) + '%';
+            document.getElementById('escalations').textContent = data.escalations || 0;
+            document.getElementById('kycQueries').textContent = data.kycQueries || 0;
+            document.getElementById('investmentQueries').textContent = data.investmentQueries || 0;
+            document.getElementById('transactionQueries').textContent = data.transactionQueries || 0;
+
+            // Input type ratio
+            const inputDist = data.inputTypeDistribution || {};
+            const voice = inputDist.voice || 0;
+            const text = inputDist.text || 0;
+            document.getElementById('inputTypeRatio').textContent = `${voice} voice / ${text} text`;
+
+            // Update last updated time
+            document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+
+            // Update charts
+            updateLanguageChart(data.languageDistribution || {});
+            updateIntentChart(data.intentDistribution || {});
+            updateLanguageTable(data.languageDistribution || {}, data.totalQueries || 0);
+        }
+
+        function updateLanguageChart(distribution) {
+            const ctx = document.getElementById('languageChart').getContext('2d');
+            const labels = Object.keys(distribution).map(l => languageNames[l] || l);
+            const values = Object.values(distribution);
+            const colors = Object.keys(distribution).map(l => languageColors[l] || '#888');
+
+            if (languageChart) languageChart.destroy();
+
+            languageChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#94a3b8', font: { size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateIntentChart(distribution) {
+            const ctx = document.getElementById('intentChart').getContext('2d');
+            const labels = Object.keys(distribution).map(i => i.charAt(0).toUpperCase() + i.slice(1).replace('_', ' '));
+            const values = Object.values(distribution);
+
+            if (intentChart) intentChart.destroy();
+
+            intentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Queries',
+                        data: values,
+                        backgroundColor: ['#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateLanguageTable(distribution, total) {
+            const tbody = document.getElementById('languageTable');
+            if (Object.keys(distribution).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-[var(--text-secondary)]">No data yet</td></tr>';
+                return;
+            }
+
+            const sorted = Object.entries(distribution).sort((a, b) => b[1] - a[1]);
+            tbody.innerHTML = sorted.map(([lang, count]) => {
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+                const color = languageColors[lang] || '#888';
+                return `
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                        <td class="py-3 px-4 font-medium">${languageNames[lang] || lang}</td>
+                        <td class="py-3 px-4 text-right">${count}</td>
+                        <td class="py-3 px-4 text-right">${percentage}%</td>
+                        <td class="py-3 px-4">
+                            <div class="w-full bg-white/10 rounded-full h-2">
+                                <div class="h-2 rounded-full" style="width: ${percentage}%; background: ${color}"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function refreshData() {
+            fetchDashboardData();
+        }
+
+        // Initial load
+        fetchDashboardData();
+
+        // Auto-refresh every 30 seconds
+        setInterval(fetchDashboardData, 30000);
+    </script>
+</body>
+</html>

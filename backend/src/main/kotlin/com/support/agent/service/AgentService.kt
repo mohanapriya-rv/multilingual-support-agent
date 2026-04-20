@@ -12,12 +12,15 @@ class AgentService(
     private val intentExtractorService: IntentExtractorService,
     private val dataFetcherService: DataFetcherService,
     private val responseFormatterService: ResponseFormatterService,
-    private val escalationService: EscalationService
+    private val escalationService: EscalationService,
+    private val suggestionService: SuggestionService,
+    private val analyticsService: AnalyticsService
 ) {
     private val logger = LoggerFactory.getLogger(AgentService::class.java)
 
     fun processMessage(request: ChatRequest): ChatResponse {
         val sessionId = request.sessionId ?: UUID.randomUUID().toString()
+        val inputType = request.inputType ?: "text"
         
         logger.info("Processing message from user ${request.userId}: ${request.message}")
 
@@ -43,6 +46,21 @@ class AgentService(
                 escalation.id
             )
             
+            // Track analytics for escalation
+            analyticsService.trackInteraction(
+                userId = request.userId,
+                sessionId = sessionId,
+                language = extractedIntent.detectedLanguage,
+                inputType = inputType,
+                intentCategory = extractedIntent.intentCategory,
+                intentType = extractedIntent.intentType,
+                responseGiven = true,
+                escalated = true,
+                confidence = extractedIntent.confidence
+            )
+            
+            val suggestions = suggestionService.getSuggestions("escalation", extractedIntent.detectedLanguage)
+            
             return ChatResponse(
                 sessionId = sessionId,
                 response = escalationMessage,
@@ -51,13 +69,29 @@ class AgentService(
                 intentType = extractedIntent.intentType,
                 escalated = true,
                 escalationId = escalation.id,
-                confidence = extractedIntent.confidence
+                confidence = extractedIntent.confidence,
+                suggestions = suggestions,
+                inputType = inputType
             )
         }
 
         // Step 3: Check if query is in scope
         if (!extractedIntent.isInScope) {
             val outOfScopeMessage = escalationService.getOutOfScopeMessage(extractedIntent.detectedLanguage)
+            val defaultSuggestions = suggestionService.getSuggestions(null, extractedIntent.detectedLanguage)
+            
+            // Track analytics for out-of-scope
+            analyticsService.trackInteraction(
+                userId = request.userId,
+                sessionId = sessionId,
+                language = extractedIntent.detectedLanguage,
+                inputType = inputType,
+                intentCategory = "out_of_scope",
+                intentType = extractedIntent.intentType,
+                responseGiven = true,
+                escalated = false,
+                confidence = extractedIntent.confidence
+            )
             
             return ChatResponse(
                 sessionId = sessionId,
@@ -66,7 +100,9 @@ class AgentService(
                 intentCategory = extractedIntent.intentCategory,
                 intentType = extractedIntent.intentType,
                 escalated = false,
-                confidence = extractedIntent.confidence
+                confidence = extractedIntent.confidence,
+                suggestions = defaultSuggestions,
+                inputType = inputType
             )
         }
 
@@ -75,13 +111,32 @@ class AgentService(
         
         logger.info("Fetched data: $data")
 
-        // Step 5: Format response using Gemini (with FAQ context)
+        // Step 5: Format response using Claude (with FAQ context)
         val response = responseFormatterService.format(
             request.message,
             extractedIntent.detectedLanguage,
-            extractedIntent.intentCategory,  // NEW: Pass intent category for FAQ lookup
+            extractedIntent.intentCategory,
             data,
             request.conversationHistory
+        )
+
+        // Step 6: Get context-aware suggestions in detected language
+        val suggestions = suggestionService.getSuggestions(
+            extractedIntent.intentCategory,
+            extractedIntent.detectedLanguage
+        )
+
+        // Step 7: Track analytics
+        analyticsService.trackInteraction(
+            userId = request.userId,
+            sessionId = sessionId,
+            language = extractedIntent.detectedLanguage,
+            inputType = inputType,
+            intentCategory = extractedIntent.intentCategory,
+            intentType = extractedIntent.intentType,
+            responseGiven = true,
+            escalated = false,
+            confidence = extractedIntent.confidence
         )
 
         return ChatResponse(
@@ -91,7 +146,9 @@ class AgentService(
             intentCategory = extractedIntent.intentCategory,
             intentType = extractedIntent.intentType,
             escalated = false,
-            confidence = extractedIntent.confidence
+            confidence = extractedIntent.confidence,
+            suggestions = suggestions,
+            inputType = inputType
         )
     }
 }

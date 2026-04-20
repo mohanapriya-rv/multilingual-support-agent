@@ -8,5 +8,7 @@ data class ChatResponse(
     val intentType: String?,
     val escalated: Boolean = false,
     val escalationId: Long? = null,
-    val confidence: Double = 0.0
+    val confidence: Double = 0.0,
+    val suggestions: List<String> = emptyList(),
+    val inputType: String = "text"
 )

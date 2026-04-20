@@ -11,5 +11,7 @@ data class ChatRequest(
     
     val sessionId: String? = null,
     
-    val conversationHistory: List<ConversationMessage> = emptyList()
+    val conversationHistory: List<ConversationMessage> = emptyList(),
+    
+    val inputType: String? = "text"  // "text" or "voice"
 )

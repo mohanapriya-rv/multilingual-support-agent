@@ -158,6 +158,13 @@
                     </div>
 
                     <div class="flex items-center gap-3 flex-wrap justify-end">
+                        <!-- Dashboard link -->
+                        <a href="dashboard.html" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-600/20 border border-purple-500/30 text-purple-300 hover:bg-purple-500/30 transition text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            Dashboard
+                        </a>
                         <!-- Language dropdown trigger -->
                         <div class="relative">
                             <button id="languageTrigger" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-[rgba(5,9,25,0.7)] border border-[rgba(255,255,255,0.12)] text-white hover:bg-white/15 transition">
@@ -187,6 +194,11 @@
                     <option value="tamil">தமிழ் (Tamil)</option>
                     <option value="telugu">తెలుగు (Telugu)</option>
                     <option value="kannada">ಕನ್ನಡ (Kannada)</option>
+                    <option value="malayalam">മലയാളം (Malayalam)</option>
+                    <option value="bengali">বাংলা (Bengali)</option>
+                    <option value="marathi">मराठी (Marathi)</option>
+                    <option value="gujarati">ગુજરાતી (Gujarati)</option>
+                    <option value="punjabi">ਪੰਜਾਬੀ (Punjabi)</option>
                 </select>
                 <select id="userSelect" class="hidden">
                     <option value="USR001">Rajesh Kumar (USR001)</option>
@@ -208,31 +220,31 @@
                             </div>
                         </div>
                         <div class="space-y-2">
-                            <h2 id="heroTitle" class="text-2xl md:text-3xl font-semibold text-white">Hello! I'm your Multilingual Assistant</h2>
-                            <p id="heroSubtitle" class="text-[var(--text-secondary)] text-base md:text-lg max-w-3xl mx-auto">I can help with verification, transaction issues, or account settings in over 50 languages. How can I assist you today?</p>
+                            <h2 id="heroTitle" class="text-2xl md:text-3xl font-semibold text-white">Hi, I'm Nira — your Multilingual Assistant</h2>
+                            <p id="heroSubtitle" class="text-[var(--text-secondary)] text-base md:text-lg max-w-3xl mx-auto">Speak naturally — instant support in your preferred language</p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div class="feature-card rounded-2xl p-4 text-left">
                                 <div class="w-10 h-10 rounded-lg bg-purple-500/20 text-purple-200 flex items-center justify-center mb-3">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M8 9h4m-4 3h6m-6 3h4m-6 3h10a2 2 0 002-2V6a2 2 0 00-2-2H7a2 2 0 00-2 2v14l3-3z"/></svg>
+                                    <span class="text-xl">⚡</span>
                                 </div>
-                                <h3 id="feature1Title" class="text-white font-semibold">Real-time Translation</h3>
-                                <p id="feature1Desc" class="text-[var(--text-secondary)] text-sm mt-1">Speak naturally. I'll translate in real-time across 50+ languages.</p>
+                                <h3 id="feature1Title" class="text-white font-semibold">Instant Help</h3>
+                                <p id="feature1Desc" class="text-[var(--text-secondary)] text-sm mt-1">Chat in your language — fast, simple, seamless</p>
                             </div>
                             <div class="feature-card rounded-2xl p-4 text-left">
                                 <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-200 flex items-center justify-center mb-3">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M12 11c-1.657 0-3-1.343-3-3V6a3 3 0 116 0v2c0 1.657-1.343 3-3 3zm-6 2a6 6 0 1112 0v3.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 016 16.5V13z"/></svg>
                                 </div>
-                                <h3 id="feature2Title" class="text-white font-semibold">Secure & Encrypted</h3>
-                                <p id="feature2Desc" class="text-[var(--text-secondary)] text-sm mt-1">Your data is protected by industry-standard end-to-end encryption.</p>
+                                <h3 id="feature2Title" class="text-white font-semibold">Secure & Private</h3>
+                                <p id="feature2Desc" class="text-[var(--text-secondary)] text-sm mt-1">Your data stays protected with end-to-end encryption</p>
                             </div>
                             <div class="feature-card rounded-2xl p-4 text-left">
                                 <div class="w-10 h-10 rounded-lg bg-indigo-400/20 text-indigo-200 flex items-center justify-center mb-3">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M13 16h-1v-4h-1m2-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span class="text-xl">🤖</span>
                                 </div>
-                                <h3 id="feature3Title" class="text-white font-semibold">Instant Solutions</h3>
-                                <p id="feature3Desc" class="text-[var(--text-secondary)] text-sm mt-1">Get answers to your questions without waiting for human intervention.</p>
+                                <h3 id="feature3Title" class="text-white font-semibold">Smart Support</h3>
+                                <p id="feature3Desc" class="text-[var(--text-secondary)] text-sm mt-1">Get answers instantly — no waiting, no hassle</p>
                             </div>
                         </div>
                         <p id="readyLabel" class="text-[var(--text-secondary)] uppercase tracking-[0.35em] text-xs">Ready to Assist</p>
@@ -324,11 +336,17 @@
             tamil: '🇮🇳 Tamil',
             telugu: '🇮🇳 Telugu',
             kannada: '🇮🇳 Kannada',
+            malayalam: '🇮🇳 Malayalam',
+            bengali: '🇮🇳 Bengali',
+            marathi: '🇮🇳 Marathi',
+            gujarati: '🇮🇳 Gujarati',
+            punjabi: '🇮🇳 Punjabi',
             english: '🇬🇧 English'
         };
 
         const languageCodes = {
-            english: 'EN', hindi: 'HI', tamil: 'TA', telugu: 'TE', kannada: 'KN'
+            english: 'EN', hindi: 'HI', tamil: 'TA', telugu: 'TE', kannada: 'KN',
+            malayalam: 'ML', bengali: 'BN', marathi: 'MR', gujarati: 'GU', punjabi: 'PA'
         };
 
         const languageNames = {
@@ -336,34 +354,62 @@
             hindi: 'HINDI',
             tamil: 'TAMIL',
             telugu: 'TELUGU',
-            kannada: 'KANNADA'
+            kannada: 'KANNADA',
+            malayalam: 'MALAYALAM',
+            bengali: 'BENGALI',
+            marathi: 'MARATHI',
+            gujarati: 'GUJARATI',
+            punjabi: 'PUNJABI'
         };
+
+        // Dynamic suggestions based on detected intent
+        const intentSuggestions = {
+            kyc: ['Check KYC status', 'Update PAN details', 'Upload documents', 'KYC pending?'],
+            transaction: ['Track transaction', 'Payment delayed?', 'Recent transactions', 'Download receipt'],
+            account: ['Reset password', 'OTP not received', 'Unlock account', 'Update mobile'],
+            mutual_fund: ['Portfolio value', 'SIP status', 'Start new SIP', 'Redeem funds']
+        };
+
+        let lastDetectedIntent = null;
+        let currentInputType = 'text';
 
         const BOT_ICON = 'assets/logo.png';
 
+        // Update suggestions from backend response (language-specific)
+        function updateSuggestionsFromBackend(suggestions) {
+            const chipsContainer = document.getElementById('suggestionChips');
+            if (!chipsContainer || !suggestions || suggestions.length === 0) return;
+            
+            chipsContainer.innerHTML = suggestions.map(text => `
+                <button class="chip-btn suggestion-chip px-4 py-2 rounded-full text-sm flex items-center gap-2" onclick="sendQuickMessage('${text.replace(/'/g, "\\'")}')">
+                    ${text}
+                </button>
+            `).join('');
+        }
+
         const i18n = {
             english: {
-                brand: 'ZIVRA',
+                brand: 'NIRA',
                 brandSub: 'Multilingual • AI Powered',
-                heroTitle: "Hi, I’m Zivra - your Multilingual Assistant.",
-                heroSubtitle: "I can help with verification, transaction issues, or account settings in over 50 languages. How can I assist you today?",
+                heroTitle: "Hi, I'm Nira — your Multilingual Assistant",
+                heroSubtitle: "Speak naturally — instant support in your preferred language",
                 features: [
-                    { title: 'Real-time Translation', desc: "Speak naturally. I'll translate in real-time across 50+ languages." },
-                    { title: 'Secure & Encrypted', desc: 'Your data is protected by industry-standard end-to-end encryption.' },
-                    { title: 'Instant Solutions', desc: 'Get answers to your questions without waiting for human intervention.' }
+                    { title: 'Instant Help ⚡', desc: 'Chat in your language — fast, simple, seamless' },
+                    { title: 'Secure & Private', desc: 'Your data stays protected with end-to-end encryption' },
+                    { title: 'Smart Support 🤖', desc: 'Get answers instantly — no waiting, no hassle' }
                 ],
                 ready: 'Ready to Assist',
-                quick: 'Quick Start Suggestions',
-                chips: ['KYC verification','Reset PIN','Transaction issue','Contact Live Agent','Security Settings','Update Contact Number','Update Email','Update Address'],
-                inputPlaceholder: 'How can I help you today? Type in any language...',
+                quick: 'Quick Suggestions',
+                chips: ['Check KYC status','Track transaction','View portfolio','Reset PIN','Contact support','Update details'],
+                inputPlaceholder: 'Type your question in any language...',
                 enterToSend: 'Enter to send',
                 shiftNewLine: 'Shift + Enter for new line',
                 clearHistory: 'Clear History',
                 activeSession: 'Active Session ID',
                 activeDialogue: 'Active Dialogue',
-                analyzing: 'Assistant is analyzing...',
+                analyzing: 'Analyzing your request...',
                 send: 'Send',
-                error: 'Sorry, I encountered an error. Please try again.'
+                error: 'Sorry, something went wrong. Please try again.'
             },
             hindi: {
                 brand: 'ज़िव्रा',
@@ -456,6 +502,121 @@
                 analyzing: 'ಸಹಾಯಕ ವಿಶ್ಲೇಷಿಸುತ್ತಿದ್ದಾರೆ...',
                 send: 'ಕಳುಹಿಸಿ',
                 error: 'ಕ್ಷಮಿಸಿ, ದೋಷ ಸಂಭವಿಸಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.'
+            },
+            malayalam: {
+                brand: 'നീര',
+                brandSub: 'ബഹുഭാഷ • AI പവേർഡ്',
+                heroTitle: 'ഹലോ, ഞാൻ നീര — നിങ്ങളുടെ ബഹുഭാഷ അസിസ്റ്റന്റ്',
+                heroSubtitle: 'നിങ്ങളുടെ ഭാഷയിൽ സംസാരിക്കൂ — വേഗത്തിലുള്ള, ലളിതമായ സഹായം',
+                features: [
+                    { title: 'തൽക്ഷണ സഹായം ⚡', desc: 'നിങ്ങളുടെ ഭാഷയിൽ ചാറ്റ് — വേഗത്തിൽ, ലളിതം' },
+                    { title: 'സുരക്ഷിത & സ്വകാര്യ', desc: 'നിങ്ങളുടെ ഡാറ്റ എൻഡ്-ടു-എൻഡ് എൻക്രിപ്ഷൻ കൊണ്ട് സുരക്ഷിതം' },
+                    { title: 'സ്മാർട്ട് സപ്പോർട്ട് 🤖', desc: 'തൽക്ഷണ ഉത്തരങ്ങൾ — കാത്തിരിപ്പില്ല' }
+                ],
+                ready: 'സഹായിക്കാൻ തയ്യാർ',
+                quick: 'ദ്രുത നിർദ്ദേശങ്ങൾ',
+                chips: ['KYC സ്റ്റാറ്റസ്','ഇടപാട് ട്രാക്ക്','പോർട്ട്ഫോളിയോ','PIN റീസെറ്റ്','സപ്പോർട്ട്','വിവരങ്ങൾ അപ്ഡേറ്റ്'],
+                inputPlaceholder: 'ഏത് ഭാഷയിലും നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്യൂ...',
+                enterToSend: 'അയയ്ക്കാൻ Enter',
+                shiftNewLine: 'പുതിയ വരിക്ക് Shift + Enter',
+                clearHistory: 'ചരിത്രം മായ്ക്കുക',
+                activeSession: 'സജീവ സെഷൻ ID',
+                activeDialogue: 'സജീവ സംഭാഷണം',
+                analyzing: 'നിങ്ങളുടെ അഭ്യർത്ഥന വിശകലനം...',
+                send: 'അയയ്ക്കുക',
+                error: 'ക്ഷമിക്കണം, എന്തോ തെറ്റ് സംഭവിച്ചു. വീണ്ടും ശ്രമിക്കുക.'
+            },
+            bengali: {
+                brand: 'নীরা',
+                brandSub: 'বহুভাষা • AI চালিত',
+                heroTitle: 'হ্যালো, আমি নীরা — আপনার বহুভাষা সহায়ক',
+                heroSubtitle: 'আপনার ভাষায় কথা বলুন — দ্রুত, সহজ সাহায্য',
+                features: [
+                    { title: 'তাৎক্ষণিক সাহায্য ⚡', desc: 'আপনার ভাষায় চ্যাট — দ্রুত, সহজ' },
+                    { title: 'নিরাপদ ও প্রাইভেট', desc: 'আপনার ডেটা এন্ড-টু-এন্ড এনক্রিপশন দ্বারা সুরক্ষিত' },
+                    { title: 'স্মার্ট সাপোর্ট 🤖', desc: 'তাৎক্ষণিক উত্তর — অপেক্ষা নেই' }
+                ],
+                ready: 'সাহায্য করতে প্রস্তুত',
+                quick: 'দ্রুত পরামর্শ',
+                chips: ['KYC স্ট্যাটাস','লেনদেন ট্র্যাক','পোর্টফোলিও','PIN রিসেট','সাপোর্ট','বিবরণ আপডেট'],
+                inputPlaceholder: 'যেকোনো ভাষায় আপনার প্রশ্ন টাইপ করুন...',
+                enterToSend: 'পাঠাতে Enter',
+                shiftNewLine: 'নতুন লাইনে Shift + Enter',
+                clearHistory: 'ইতিহাস মুছুন',
+                activeSession: 'সক্রিয় সেশন ID',
+                activeDialogue: 'সক্রিয় কথোপকথন',
+                analyzing: 'আপনার অনুরোধ বিশ্লেষণ...',
+                send: 'পাঠান',
+                error: 'দুঃখিত, কিছু ভুল হয়েছে। আবার চেষ্টা করুন।'
+            },
+            marathi: {
+                brand: 'नीरा',
+                brandSub: 'बहुभाषा • AI चालित',
+                heroTitle: 'नमस्कार, मी नीरा — तुमची बहुभाषा सहाय्यक',
+                heroSubtitle: 'तुमच्या भाषेत बोला — जलद, सोपी मदत',
+                features: [
+                    { title: 'त्वरित मदत ⚡', desc: 'तुमच्या भाषेत चॅट — जलद, सोपे' },
+                    { title: 'सुरक्षित व खाजगी', desc: 'तुमचा डेटा एंड-टू-एंड एन्क्रिप्शनने सुरक्षित' },
+                    { title: 'स्मार्ट सपोर्ट 🤖', desc: 'त्वरित उत्तरे — प्रतीक्षा नाही' }
+                ],
+                ready: 'मदतीसाठी तयार',
+                quick: 'जलद सूचना',
+                chips: ['KYC स्थिती','व्यवहार ट्रॅक','पोर्टफोलिओ','PIN रीसेट','सपोर्ट','तपशील अपडेट'],
+                inputPlaceholder: 'कोणत्याही भाषेत तुमचा प्रश्न टाइप करा...',
+                enterToSend: 'पाठवण्यासाठी Enter',
+                shiftNewLine: 'नवीन ओळीसाठी Shift + Enter',
+                clearHistory: 'इतिहास साफ करा',
+                activeSession: 'सक्रिय सत्र ID',
+                activeDialogue: 'सक्रिय संवाद',
+                analyzing: 'तुमची विनंती विश्लेषण...',
+                send: 'पाठवा',
+                error: 'क्षमा करा, काहीतरी चूक झाली. पुन्हा प्रयत्न करा.'
+            },
+            gujarati: {
+                brand: 'નીરા',
+                brandSub: 'બહુભાષી • AI સંચાલિત',
+                heroTitle: 'નમસ્તે, હું નીરા — તમારી બહુભાષી સહાયક',
+                heroSubtitle: 'તમારી ભાષામાં વાત કરો — ઝડપી, સરળ મદદ',
+                features: [
+                    { title: 'તાત્કાલિક મદદ ⚡', desc: 'તમારી ભાષામાં ચેટ — ઝડપી, સરળ' },
+                    { title: 'સુરક્ષિત અને ખાનગી', desc: 'તમારો ડેટા એન્ડ-ટુ-એન્ડ એન્ક્રિપ્શનથી સુરક્ષિત' },
+                    { title: 'સ્માર્ટ સપોર્ટ 🤖', desc: 'તાત્કાલિક જવાબો — રાહ નથી' }
+                ],
+                ready: 'મદદ માટે તૈયાર',
+                quick: 'ઝડપી સૂચનો',
+                chips: ['KYC સ્થિતિ','વ્યવહાર ટ્રેક','પોર્ટફોલિયો','PIN રીસેટ','સપોર્ટ','વિગતો અપડેટ'],
+                inputPlaceholder: 'કોઈપણ ભાષામાં તમારો પ્રશ્ન ટાઈપ કરો...',
+                enterToSend: 'મોકલવા Enter',
+                shiftNewLine: 'નવી લાઈન માટે Shift + Enter',
+                clearHistory: 'ઇતિહાસ સાફ કરો',
+                activeSession: 'સક્રિય સત્ર ID',
+                activeDialogue: 'સક્રિય સંવાદ',
+                analyzing: 'તમારી વિનંતી વિશ્લેષણ...',
+                send: 'મોકલો',
+                error: 'માફ કરશો, કંઈક ખોટું થયું. ફરી પ્રયાસ કરો.'
+            },
+            punjabi: {
+                brand: 'ਨੀਰਾ',
+                brandSub: 'ਬਹੁਭਾਸ਼ੀ • AI ਸੰਚਾਲਿਤ',
+                heroTitle: 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ਮੈਂ ਨੀਰਾ — ਤੁਹਾਡੀ ਬਹੁਭਾਸ਼ੀ ਸਹਾਇਕ',
+                heroSubtitle: 'ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ ਬੋਲੋ — ਤੇਜ਼, ਸਰਲ ਮਦਦ',
+                features: [
+                    { title: 'ਤੁਰੰਤ ਮਦਦ ⚡', desc: 'ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ ਚੈਟ — ਤੇਜ਼, ਸਰਲ' },
+                    { title: 'ਸੁਰੱਖਿਅਤ ਅਤੇ ਨਿੱਜੀ', desc: 'ਤੁਹਾਡਾ ਡਾਟਾ ਐਂਡ-ਟੂ-ਐਂਡ ਐਨਕ੍ਰਿਪਸ਼ਨ ਨਾਲ ਸੁਰੱਖਿਅਤ' },
+                    { title: 'ਸਮਾਰਟ ਸਪੋਰਟ 🤖', desc: 'ਤੁਰੰਤ ਜਵਾਬ — ਉਡੀਕ ਨਹੀਂ' }
+                ],
+                ready: 'ਮਦਦ ਲਈ ਤਿਆਰ',
+                quick: 'ਤੇਜ਼ ਸੁਝਾਅ',
+                chips: ['KYC ਸਥਿਤੀ','ਲੈਣ-ਦੇਣ ਟ੍ਰੈਕ','ਪੋਰਟਫੋਲੀਓ','PIN ਰੀਸੈਟ','ਸਪੋਰਟ','ਵੇਰਵੇ ਅਪਡੇਟ'],
+                inputPlaceholder: 'ਕਿਸੇ ਵੀ ਭਾਸ਼ਾ ਵਿੱਚ ਆਪਣਾ ਸਵਾਲ ਟਾਈਪ ਕਰੋ...',
+                enterToSend: 'ਭੇਜਣ ਲਈ Enter',
+                shiftNewLine: 'ਨਵੀਂ ਲਾਈਨ ਲਈ Shift + Enter',
+                clearHistory: 'ਇਤਿਹਾਸ ਸਾਫ਼ ਕਰੋ',
+                activeSession: 'ਸਰਗਰਮ ਸੈਸ਼ਨ ID',
+                activeDialogue: 'ਸਰਗਰਮ ਗੱਲਬਾਤ',
+                analyzing: 'ਤੁਹਾਡੀ ਬੇਨਤੀ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ...',
+                send: 'ਭੇਜੋ',
+                error: 'ਮਾਫ਼ ਕਰਨਾ, ਕੁਝ ਗਲਤ ਹੋਇਆ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।'
             }
         };
 
@@ -496,7 +657,8 @@
                         userId,
                         message,
                         sessionId,
-                        conversationHistory: conversationHistory.slice(-6)
+                        conversationHistory: conversationHistory.slice(-6),
+                        inputType: currentInputType || 'text'
                     })
                 });
 
@@ -507,7 +669,8 @@
                     language: data.detectedLanguage,
                     escalated: data.escalated,
                     intentCategory: data.intentCategory,
-                    confidence: data.confidence
+                    confidence: data.confidence,
+                    suggestions: data.suggestions
                 });
 
                 conversationHistory.push({ role: 'assistant', content: data.response, meta: {
@@ -517,6 +680,14 @@
                     confidence: data.confidence
                 }});
                 persistCurrentHistory();
+
+                // Update suggestions from backend (language-specific)
+                if (data.suggestions && data.suggestions.length > 0) {
+                    updateSuggestionsFromBackend(data.suggestions);
+                }
+
+                // Reset input type
+                currentInputType = 'text';
 
                 if (data.escalated) {
                     showEscalationModal(data.response);
@@ -844,9 +1015,30 @@
                 hindi: 'hi-IN',
                 tamil: 'ta-IN',
                 telugu: 'te-IN',
-                kannada: 'kn-IN'
+                kannada: 'kn-IN',
+                malayalam: 'ml-IN',
+                bengali: 'bn-IN',
+                marathi: 'mr-IN',
+                gujarati: 'gu-IN',
+                punjabi: 'pa-IN'
             };
             return map[lang] || 'en-US';
+        }
+
+        // Update suggestions based on detected intent
+        function updateSuggestionsForIntent(intentCategory) {
+            if (intentSuggestions[intentCategory]) {
+                lastDetectedIntent = intentCategory;
+                const lang = document.getElementById('languageSelect').value;
+                const t = getI18n();
+                const suggestions = intentSuggestions[intentCategory];
+                const chipsContainer = document.getElementById('suggestionChips');
+                chipsContainer.innerHTML = suggestions.map(text => `
+                    <button class="chip-btn suggestion-chip px-4 py-2 rounded-full text-sm flex items-center gap-2" onclick="sendQuickMessage('${text.replace(/'/g, "\\'")}')">
+                        ${text}
+                    </button>
+                `).join('');
+            }
         }
 
         function ensureRecognition() {
@@ -882,6 +1074,7 @@
             micBtn.classList.add('border-emerald-400', 'bg-emerald-500/10', 'text-white');
             if (indicator) indicator.classList.remove('hidden');
             isListening = true;
+            currentInputType = 'voice';  // Set input type to voice
             rec.onresult = (event) => {
                 let transcript = '';
                 for (let i = event.resultIndex; i < event.results.length; i++) {
