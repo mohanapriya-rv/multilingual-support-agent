@@ -45,8 +45,20 @@
                     Nira Analytics Dashboard
                 </h1>
                 <p class="text-[var(--text-secondary)] mt-1">Real-time insights for your support agent</p>
+                <p id="dateRange" class="text-sm text-purple-400 mt-1"></p>
             </div>
             <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <input type="date" id="startDate" class="px-3 py-2 bg-[rgba(255,255,255,0.05)] border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-purple-500">
+                    <span class="text-[var(--text-secondary)]">to</span>
+                    <input type="date" id="endDate" class="px-3 py-2 bg-[rgba(255,255,255,0.05)] border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-purple-500">
+                    <button onclick="applyDateFilter()" class="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium">
+                        Apply
+                    </button>
+                    <button onclick="resetDateFilter()" class="px-3 py-2 border border-white/20 hover:bg-white/10 rounded-lg text-sm font-medium">
+                        Reset
+                    </button>
+                </div>
                 <span id="lastUpdated" class="text-sm text-[var(--text-secondary)]">Last updated: --</span>
                 <button onclick="refreshData()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,14 +235,32 @@
             punjabi: '🇮🇳 Punjabi'
         };
 
-        async function fetchDashboardData() {
+        async function fetchDashboardData(startDate = null, endDate = null) {
             try {
-                const response = await fetch(`${API_BASE}/analytics/dashboard`);
+                let url = `${API_BASE}/analytics/dashboard`;
+                const params = new URLSearchParams();
+                if (startDate) params.append('startDate', startDate);
+                if (endDate) params.append('endDate', endDate);
+                if (params.toString()) url += '?' + params.toString();
+                
+                const response = await fetch(url);
                 const data = await response.json();
                 updateDashboard(data);
             } catch (error) {
                 console.error('Failed to fetch dashboard data:', error);
             }
+        }
+
+        function applyDateFilter() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            fetchDashboardData(startDate, endDate);
+        }
+
+        function resetDateFilter() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            fetchDashboardData();
         }
 
         function updateDashboard(data) {
@@ -249,6 +279,11 @@
             const voice = inputDist.voice || 0;
             const text = inputDist.text || 0;
             document.getElementById('inputTypeRatio').textContent = `${voice} voice / ${text} text`;
+
+            // Update date range display
+            const start = new Date(data.startDate).toLocaleDateString();
+            const end = new Date(data.endDate).toLocaleDateString();
+            document.getElementById('dateRange').textContent = `${start} - ${end}`;
 
             // Update last updated time
             document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();

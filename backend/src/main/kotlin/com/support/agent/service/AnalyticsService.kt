@@ -46,47 +46,56 @@ class AnalyticsService(
         }
     }
 
-    fun getDashboardStats(): DashboardStats {
+    fun getDashboardStats(startDate: LocalDate? = null, endDate: LocalDate? = null): DashboardStats {
         val today = LocalDate.now()
-        val startOfDay = today.atStartOfDay()
+        val start = startDate?.atStartOfDay() ?: today.atStartOfDay()
+        val end = endDate?.plusDays(1)?.atStartOfDay() ?: today.plusDays(1).atStartOfDay()
+        
+        val dateRangeEvents = analyticsRepository.findByTimestampBetween(start, end)
         
         return DashboardStats(
-            totalConversations = analyticsRepository.countDistinctSessions(),
-            totalQueries = analyticsRepository.count(),
-            todayQueries = analyticsRepository.countByTimestampAfter(startOfDay),
-            kycQueries = analyticsRepository.countByIntentCategory("kyc"),
-            investmentQueries = analyticsRepository.countByIntentCategory("mutual_fund"),
-            transactionQueries = analyticsRepository.countByIntentCategory("transaction"),
-            escalations = analyticsRepository.countByEscalated(true),
-            languageDistribution = getLanguageDistribution(),
-            inputTypeDistribution = getInputTypeDistribution(),
-            intentDistribution = getIntentDistribution(),
-            successRate = calculateSuccessRate()
+            totalConversations = dateRangeEvents.map { it.sessionId }.distinct().size.toLong(),
+            totalQueries = dateRangeEvents.size.toLong(),
+            todayQueries = analyticsRepository.countByTimestampAfter(today.atStartOfDay()),
+            kycQueries = dateRangeEvents.count { it.intentCategory == "kyc" },
+            investmentQueries = dateRangeEvents.count { it.intentCategory == "mutual_fund" },
+            transactionQueries = dateRangeEvents.count { it.intentCategory == "transaction" },
+            escalations = dateRangeEvents.count { it.escalated },
+            languageDistribution = getLanguageDistribution(dateRangeEvents),
+            inputTypeDistribution = getInputTypeDistribution(dateRangeEvents),
+            intentDistribution = getIntentDistribution(dateRangeEvents),
+            successRate = calculateSuccessRate(dateRangeEvents),
+            startDate = startDate ?: today,
+            endDate = endDate ?: today
         )
     }
 
-    fun getLanguageDistribution(): Map<String, Long> {
-        return analyticsRepository.findAll()
+    fun getLanguageDistribution(events: List<AnalyticsEvent>? = null): Map<String, Long> {
+        val eventList = events ?: analyticsRepository.findAll()
+        return eventList
             .groupBy { it.language.lowercase() }
             .mapValues { it.value.size.toLong() }
     }
 
-    fun getInputTypeDistribution(): Map<String, Long> {
-        return analyticsRepository.findAll()
+    fun getInputTypeDistribution(events: List<AnalyticsEvent>? = null): Map<String, Long> {
+        val eventList = events ?: analyticsRepository.findAll()
+        return eventList
             .groupBy { it.inputType }
             .mapValues { it.value.size.toLong() }
     }
 
-    fun getIntentDistribution(): Map<String, Long> {
-        return analyticsRepository.findAll()
+    fun getIntentDistribution(events: List<AnalyticsEvent>? = null): Map<String, Long> {
+        val eventList = events ?: analyticsRepository.findAll()
+        return eventList
             .groupBy { it.intentCategory }
             .mapValues { it.value.size.toLong() }
     }
 
-    fun calculateSuccessRate(): Double {
-        val total = analyticsRepository.count()
-        if (total == 0L) return 100.0
-        val successful = analyticsRepository.countByResponseGiven(true)
+    fun calculateSuccessRate(events: List<AnalyticsEvent>? = null): Double {
+        val eventList = events ?: analyticsRepository.findAll()
+        val total = eventList.size
+        if (total == 0) return 100.0
+        val successful = eventList.count { it.responseGiven }
         return (successful.toDouble() / total.toDouble()) * 100
     }
 
@@ -131,7 +140,9 @@ data class DashboardStats(
     val languageDistribution: Map<String, Long>,
     val inputTypeDistribution: Map<String, Long>,
     val intentDistribution: Map<String, Long>,
-    val successRate: Double
+    val successRate: Double,
+    val startDate: LocalDate,
+    val endDate: LocalDate
 )
 
 data class DailyReport(

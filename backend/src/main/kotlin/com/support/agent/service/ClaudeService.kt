@@ -60,28 +60,30 @@ Supported languages: $supportedLanguages
    - update_profile: "Update email/phone", "मोबाइल नंबर बदलना है"
 
 2. MUTUAL FUNDS:
-   - portfolio_value: "Show my investments", "मेरा पोर्टफोलियो कितना है?"
-   - sip_status: "SIP active or not", "मेरा SIP status क्या है?"
-   - sip_start: "Start new SIP", "SIP शुरू करना है"
-   - sip_stop: "Stop/pause SIP", "SIP बंद करना है"
-   - sip_modify: "Change SIP amount", "SIP amount बदलना है"
-   - fund_nav: "Current NAV of fund", "NAV क्या है?"
-   - fund_returns: "Show fund returns", "रिटर्न कितना मिला?"
-   - fund_recommend: "Suggest best fund", "कौन सा फंड अच्छा है?"
-   - redemption: "Withdraw/redeem funds", "पैसे निकालने हैं"
-   - switch_fund: "Switch between funds", "फंड स्विच करना है"
+   - portfolio_value: "Show my investments", "मेरा पोर्टफोलियो कितना है?", "My portfolio value", "Total investment", "How much have I invested", "Investment details"
+   - sip_status: "SIP active or not", "मेरा SIP status क्या है?", "Check my SIP", "SIP running or not", "Is my SIP active", "SIP details"
+   - sip_start: "Start new SIP", "SIP शुरू करना है", "I want to start SIP", "Begin SIP investment", "Create new SIP", "Setup SIP"
+   - sip_stop: "Stop/pause SIP", "SIP बंद करना है", "Cancel my SIP", "Stop SIP investment", "Pause SIP", "Terminate SIP"
+   - sip_modify: "Change SIP amount", "SIP amount बदलना है", "Increase SIP amount", "Modify SIP", "Change SIP date", "Update SIP"
+   - fund_nav: "Current NAV of fund", "NAV क्या है?", "What is NAV", "Check NAV value", "Fund NAV today"
+   - fund_returns: "Show fund returns", "रिटर्न कितना मिला?", "How much return", "Fund performance", "Investment returns", "Profit or loss"
+   - fund_recommend: "Suggest best fund", "कौन सा फंड अच्छा है?", "Which fund to invest", "Best mutual funds", "Fund recommendations", "Top performing funds"
+   - redemption: "Withdraw/redeem funds", "पैसे निकालने हैं", "Redeem my investment", "Withdraw money", "Get my money back", "Exit fund"
+   - switch_fund: "Switch between funds", "फंड स्विच करना है", "Switch my investment", "Move to another fund", "Fund switch"
 
 3. TRANSACTIONS:
-   - recent_transactions: "Recent transactions", "हाल के ट्रांजैक्शन दिखाओ"
-   - failed_payment: "Payment failed", "पेमेंट फेल हो गया"
-   - refund_status: "Refund status", "रिफंड कब आएगा?"
-   - transaction_details: "Transaction details", "ट्रांजैक्शन डिटेल्स"
+   - recent_transactions: "हाल के ट्रांजैक्शन दिखाओ", "Recent transactions", "Show my transactions", "Transaction history"
+   - failed_payment: "पेमेंट फेल हो गया", "Payment failed", "My transaction failed", "Transaction declined", "Payment not processed", "1.5 lakh transaction failed"
+   - refund_status: "रिफंड कब आएगा?", "Refund status", "Where is my refund", "Refund pending", "When will I get my money back"
+   - transaction_details: "ट्रांजैक्शन डिटेल्स", "Transaction details", "Check transaction status", "Track my payment", "Payment stuck", "Debited but not credited"
+   - refund_initiated: "Refund initiated", "Money refunded", "Amount credited back", "ट्रांजैक्शन डिटेल्स"
 
 4. KYC & COMPLIANCE:
-   - kyc_status: "Check KYC", "KYC status क्या है?"
-   - kyc_update: "Update KYC documents", "KYC अपडेट करना है"
-   - pan_link: "Link PAN card", "PAN link करना है"
-   - aadhaar_link: "Link Aadhaar", "आधार link करना है"
+   - kyc_status: "Check KYC", "KYC status क्या है?", "Is my KYC done", "KYC verification status", "KYC pending or complete", "Check verification"
+   - kyc_update: "Update KYC documents", "KYC अपडेट करना है", "Upload KYC documents", "Submit KYC", "Complete KYC", "Update my KYC"
+   - pan_link: "Link PAN card", "PAN link करना है", "Add PAN number", "Update PAN details", "Link PAN to account"
+   - aadhaar_link: "Link Aadhaar", "आधार link करना है", "Add Aadhaar", "Link Aadhaar card", "Verify Aadhaar"
+   - kyc_rejection: "KYC rejected", "KYC failed", "Why KYC rejected", "KYC not approved"
 
 5. TAX & REPORTS:
    - capital_gains: "Capital gains statement", "कैपिटल गेन रिपोर्ट"
@@ -241,14 +243,23 @@ Rules:
             lowerMessage.contains("kyc") || lowerMessage.contains("केवाईसी") || lowerMessage.contains("status") -> 
                 """{"detected_language":"$detectedLanguage","intent_category":"kyc","intent_type":"status_check","confidence":0.9,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
             
-            lowerMessage.contains("payment") || lowerMessage.contains("fail") || lowerMessage.contains("पेमेंट") || lowerMessage.contains("transaction") ->
+            lowerMessage.contains("payment") || lowerMessage.contains("fail") || lowerMessage.contains("failed") || 
+            lowerMessage.contains("पेमेंट") || lowerMessage.contains("transaction") || lowerMessage.contains("transactions") ||
+            lowerMessage.contains("lakh") || lowerMessage.contains("debit") || lowerMessage.contains("credit") ||
+            lowerMessage.contains("refund") || lowerMessage.contains("stuck") || lowerMessage.contains("pending") ->
                 """{"detected_language":"$detectedLanguage","intent_category":"transaction","intent_type":"failed_payment","confidence":0.95,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
             
-            lowerMessage.contains("balance") || lowerMessage.contains("बैलेंस") || lowerMessage.contains("account") ->
+            lowerMessage.contains("balance") || lowerMessage.contains("बैलेंस") || lowerMessage.contains("account") ||
+            lowerMessage.contains("money") || lowerMessage.contains("amount") ->
                 """{"detected_language":"$detectedLanguage","intent_category":"account","intent_type":"balance_check","confidence":0.95,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
             
-            lowerMessage.contains("fraud") || lowerMessage.contains("धोखा") ->
+            lowerMessage.contains("fraud") || lowerMessage.contains("धोखा") || lowerMessage.contains("unauthorized") ->
                 """{"detected_language":"$detectedLanguage","intent_category":"account","intent_type":"fraud_report","confidence":0.9,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":true,"escalation_reason":"Fraud mentioned by user","is_in_scope":true,"out_of_scope_reason":null}"""
+            
+            lowerMessage.contains("sip") || lowerMessage.contains("fund") || lowerMessage.contains("investment") || 
+            lowerMessage.contains("portfolio") || lowerMessage.contains("mutual") || lowerMessage.contains("redemption") ||
+            lowerMessage.contains("nav") || lowerMessage.contains("return") ->
+                """{"detected_language":"$detectedLanguage","intent_category":"mutual_fund","intent_type":"portfolio_value","confidence":0.95,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
             
             else ->
                 """{"detected_language":"$detectedLanguage","intent_category":"account","intent_type":"general_query","confidence":0.7,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""

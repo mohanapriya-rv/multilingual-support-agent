@@ -12,8 +12,13 @@ class AnalyticsController(
     private val analyticsService: AnalyticsService
 ) {
     @GetMapping("/dashboard")
-    fun getDashboardStats(): ResponseEntity<DashboardStats> {
-        return ResponseEntity.ok(analyticsService.getDashboardStats())
+    fun getDashboardStats(
+        @RequestParam(required = false) startDate: String?,
+        @RequestParam(required = false) endDate: String?
+    ): ResponseEntity<DashboardStats> {
+        val start = startDate?.let { LocalDate.parse(it) }
+        val end = endDate?.let { LocalDate.parse(it) }
+        return ResponseEntity.ok(analyticsService.getDashboardStats(start, end))
     }
 
     @GetMapping("/daily-report")
