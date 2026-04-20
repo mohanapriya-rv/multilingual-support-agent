@@ -15,10 +15,11 @@ import java.time.Duration
 @Service
 class ClaudeService(
     @Value("\${claude.api-key:}") private val apiKey: String,
-    @Value("\${claude.model:claude-haiku-4-5}") private val model: String,
+    @Value("\${claude.model:claude-3-haiku-20240307}") private val model: String,
     @Value("\${claude.max-tokens:1024}") private val maxTokens: Int,
     @Value("\${claude.timeout-seconds:30}") private val timeoutSeconds: Long,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val languageService: LanguageService
 ) {
     private val logger = LoggerFactory.getLogger(ClaudeService::class.java)
     
@@ -27,61 +28,112 @@ class ClaudeService(
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .build()
 
-    companion object {
-        const val INTENT_EXTRACTION_SYSTEM_PROMPT = """You are an intent extractor for a fintech support system. Read the user message and return ONLY a valid JSON object with these exact fields:
-- detected_language: one of "hindi", "tamil", "telugu", "kannada", "english"
-- intent_category: one of "kyc", "transaction", "account", "out_of_scope"
-- intent_type: a specific type like "status_check", "failed_payment", "balance_check", "refund_status", etc.
-- confidence: a number between 0 and 1
-- entities: object with user_id, transaction_id, merchant, amount (null if not mentioned)
-- requires_escalation: boolean (true if fraud mentioned, legal threats, permanent block, anger detected)
-- escalation_reason: string or null
-- is_in_scope: boolean (false for loans, investments, insurance, unrelated queries)
-- out_of_scope_reason: string or null
+    private fun buildIntentExtractionPrompt(): String {
+        val supportedLanguages = languageService.getSupportedLanguagesForPrompt()
+        return """
+You are an intent extraction system for a FINTECH & MUTUAL FUNDS customer support agent.
+Analyze the user's message and extract structured information.
 
-Do not return any text outside the JSON. Do not add explanation or markdown code fences.
+IMPORTANT: You MUST respond with ONLY valid JSON, no other text.
 
-Intent categories:
-- kyc: KYC verification, documents, status
-- transaction: payments, refunds, failed transfers, transaction history
-- account: balance, blocked account, profile changes
-- out_of_scope: loans, investments, insurance, unrelated queries
+Supported languages: $supportedLanguages
 
-Escalate if: fraud mentioned, legal threats, permanent account block, anger across multiple turns, asking about someone else's account."""
+=== FINTECH & MUTUAL FUNDS SUPPORTED QUERIES (20+ types) ===
 
-        const val RESPONSE_FORMATTING_SYSTEM_PROMPT = """You are a warm, helpful customer support agent for an Indian fintech app serving users across India.
+1. ACCOUNT MANAGEMENT:
+   - account_balance: "मेरा बैलेंस कितना है?", "My wallet balance"
+   - account_status: "मेरा अकाउंट ब्लॉक क्यों है?", "Account blocked reason"
+   - account_statement: "मुझे स्टेटमेंट चाहिए", "Send account statement"
+   - update_profile: "मोबाइल नंबर बदलना है", "Update email/phone"
 
-CRITICAL RULES:
-1. You must ALWAYS respond in the exact same language and script the user wrote in:
-   - If they wrote in Hindi (Devanagari script), respond in Hindi using Devanagari
-   - If Tamil script, respond in Tamil
-   - If Telugu script, respond in Telugu
-   - If Kannada script, respond in Kannada
-   - If English, respond in English
+2. MUTUAL FUNDS:
+   - portfolio_value: "मेरा पोर्टफोलियो कितना है?", "Show my investments"
+   - sip_status: "मेरा SIP status क्या है?", "SIP active or not"
+   - sip_start: "SIP शुरू करना है", "Start new SIP"
+   - sip_stop: "SIP बंद करना है", "Stop/pause SIP"
+   - sip_modify: "SIP amount बदलना है", "Change SIP amount"
+   - fund_nav: "NAV क्या है?", "Current NAV of fund"
+   - fund_returns: "रिटर्न कितना मिला?", "Show fund returns"
+   - fund_recommend: "कौन सा फंड अच्छा है?", "Suggest best fund"
+   - redemption: "पैसे निकालने हैं", "Withdraw/redeem funds"
+   - switch_fund: "फंड स्विच करना है", "Switch between funds"
 
-2. Be empathetic and culturally warm - Indian users expect this from support
+3. TRANSACTIONS:
+   - recent_transactions: "हाल के ट्रांजैक्शन दिखाओ", "Recent transactions"
+   - failed_payment: "पेमेंट फेल हो गया", "Payment failed"
+   - refund_status: "रिफंड कब आएगा?", "Refund status"
+   - transaction_details: "ट्रांजैक्शन डिटेल्स", "Transaction details"
 
-3. Use the data provided to give accurate, specific answers. Never make up data.
+4. KYC & COMPLIANCE:
+   - kyc_status: "KYC status क्या है?", "Check KYC"
+   - kyc_update: "KYC अपडेट करना है", "Update KYC documents"
+   - pan_link: "PAN link करना है", "Link PAN card"
+   - aadhaar_link: "आधार link करना है", "Link Aadhaar"
 
-4. If the data shows an error or problem, explain it clearly and tell the user what they can do next.
+5. TAX & REPORTS:
+   - capital_gains: "कैपिटल गेन रिपोर्ट", "Capital gains statement"
+   - tax_statement: "टैक्स स्टेटमेंट चाहिए", "Tax saving proof"
+   - annual_report: "सालाना रिपोर्ट", "Annual investment report"
 
-5. Keep responses concise but helpful (2-4 sentences typically).
+6. SUPPORT & ESCALATION:
+   - fraud_report: "धोखाधड़ी हुई है", "Fraud/unauthorized transaction"
+   - complaint: "शिकायत करनी है", "File complaint"
+   - speak_agent: "एजेंट से बात करनी है", "Talk to human"
 
-6. Use appropriate greetings based on language (नमस्ते for Hindi, வணக்கம் for Tamil, etc.)
+Response format (JSON only):
+{
+  "detected_language": "hindi|tamil|telugu|kannada|english",
+  "intent_category": "account|mutual_fund|transaction|kyc|tax|escalation|unknown",
+  "intent_type": "specific_intent_from_above",
+  "confidence": 0.0-1.0,
+  "entities": {
+    "user_id": null,
+    "fund_name": null,
+    "sip_id": null,
+    "transaction_id": null,
+    "amount": null
+  },
+  "requires_escalation": false,
+  "escalation_reason": null,
+  "is_in_scope": true,
+  "out_of_scope_reason": null
+}
+""".trimIndent()
+    }
 
-7. Always provide specific details from the data (amounts, dates, reasons) when available."""
+    private fun buildResponseFormattingPrompt(): String {
+        val languages = languageService.getAllActiveLanguages()
+        val greetings = languages.joinToString(", ") { "${it.greeting} (${it.name})" }
+        val languageList = languages.joinToString("/") { it.name }
+        
+        return """
+You are a friendly multilingual FINTECH & MUTUAL FUNDS customer support agent.
+You work for a financial services company helping users with investments, SIPs, and transactions.
+
+Rules:
+1. Respond ONLY in the detected language ($languageList)
+2. Be helpful, warm, and professional - this is about their money!
+3. Use appropriate greetings based on language: $greetings
+4. Format currency in Indian format: ₹1,00,000 (with commas)
+5. Format percentages clearly: 12.5% returns
+6. Keep responses concise but informative
+7. For investments, always mention any risks if applicable
+8. End with an offer to help further
+9. Use 🎯📈💰 emojis sparingly for financial context
+""".trimIndent()
     }
 
     fun extractIntent(userMessage: String, conversationHistory: List<ConversationMessage>): String {
         val messages = buildMessagesForExtraction(userMessage, conversationHistory)
-        return callClaude(INTENT_EXTRACTION_SYSTEM_PROMPT, messages, maxTokens = 500)
+        return callClaude(buildIntentExtractionPrompt(), messages, maxTokens = 500)
     }
 
     fun formatResponse(
         userMessage: String,
         detectedLanguage: String,
         data: Map<String, Any>,
-        conversationHistory: List<ConversationMessage>
+        conversationHistory: List<ConversationMessage>,
+        faqContext: String = ""
     ): String {
         if (apiKey.isBlank()) {
             logger.warn("Claude API key not configured, returning mock formatted response")
@@ -89,20 +141,21 @@ CRITICAL RULES:
         }
         
         val dataString = formatDataForPrompt(data)
-        val prompt = """User question: $userMessage
-
-Detected language: $detectedLanguage
-
-Data from database:
-$dataString
-
-Please respond to the user's question in $detectedLanguage using this data."""
+        val prompt = buildString {
+            append("User question: $userMessage\n\n")
+            append("Detected language: $detectedLanguage\n\n")
+            if (faqContext.isNotBlank()) {
+                append("FAQ Knowledge:\n$faqContext\n\n")
+            }
+            append("Data from database:\n$dataString\n\n")
+            append("Please respond to the user's question in $detectedLanguage using this data.")
+        }
 
         val messages = conversationHistory.takeLast(4).map { 
             mapOf("role" to it.role, "content" to it.content) 
         } + listOf(mapOf("role" to "user", "content" to prompt))
         
-        return callClaude(RESPONSE_FORMATTING_SYSTEM_PROMPT, messages, maxTokens = maxTokens)
+        return callClaude(buildResponseFormattingPrompt(), messages, maxTokens = maxTokens)
     }
 
     private fun buildMessagesForExtraction(

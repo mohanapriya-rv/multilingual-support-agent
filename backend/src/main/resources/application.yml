@@ -1,31 +1,40 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   datasource:
-    url: jdbc:h2:mem:supportdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ''
+    url: ${DATABASE_URL:jdbc:h2:mem:supportdb}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
+
   h2:
     console:
       enabled: true
       path: /h2-console
+
   sql:
     init:
-      mode: always
+      mode: embedded
 
 gemini:
   api-key: ${GEMINI_API_KEY:}
   model: gemini-2.5-flash
+  timeout-seconds: 30
+
+claude:
+  api-key: ${CLAUDE_API_KEY:}
+  model: claude-3-haiku-20240307
+  max-tokens: 1024
   timeout-seconds: 30
 
 cors:

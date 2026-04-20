@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service
 
 @Service
 class IntentExtractorService(
-    private val geminiService: GeminiService,
+    private val claudeService: ClaudeService,
     private val objectMapper: ObjectMapper
 ) {
     private val logger = LoggerFactory.getLogger(IntentExtractorService::class.java)
 
     fun extract(userMessage: String, conversationHistory: List<ConversationMessage>): ExtractedIntent {
         return try {
-            val response = geminiService.extractIntent(userMessage, conversationHistory)
-            logger.info("Gemini intent extraction response: $response")
+            val response = claudeService.extractIntent(userMessage, conversationHistory)
+            logger.info("Claude intent extraction response: $response")
             parseIntentResponse(response)
         } catch (e: Exception) {
             logger.error("Intent extraction failed: ${e.message}")
