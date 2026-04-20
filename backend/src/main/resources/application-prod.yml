@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/supportdb}
+    url: jdbc:${DATABASE_URL:postgresql://localhost:5432/supportdb}
     driver-class-name: org.postgresql.Driver
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
