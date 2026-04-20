@@ -28,3 +28,13 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Frontend / Capacitor
+frontend/node_modules/
+frontend/www/
+frontend/ios/App/Pods/
+frontend/ios/App/build/
+frontend/android/.gradle/
+frontend/android/build/
+frontend/android/app/build/
+frontend/android/local.properties
