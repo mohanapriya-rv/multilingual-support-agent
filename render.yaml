@@ -8,7 +8,7 @@ services:
   # Backend API
   - type: web
     name: support-agent-api
-    runtime: gradle
+    env: java
     rootDir: backend
     buildCommand: ./gradlew bootJar
     startCommand: java -jar build/libs/*.jar
@@ -38,7 +38,7 @@ services:
     name: support-agent-ui
     runtime: static
     buildCommand: echo "No build needed"
-    staticPublishPath: ./frontend
+    staticPublishPath: frontend
     headers:
       - path: /*
         name: Cache-Control
