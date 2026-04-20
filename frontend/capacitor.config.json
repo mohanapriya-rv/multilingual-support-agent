@@ -1,0 +1,13 @@
+{
+  "appId": "com.zivra.support",
+  "appName": "Zivra",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SpeechRecognition": {
+      "permissions": ["microphone", "speech"]
+    }
+  }
+}

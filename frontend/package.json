@@ -1,0 +1,25 @@
+{
+  "name": "zivra-mobile",
+  "version": "1.0.0",
+  "description": "Zivra Multilingual Support Agent - Capacitor wrapper",
+  "private": true,
+  "scripts": {
+    "prepare:web": "rm -rf www && mkdir -p www && cp index.html www/ && cp -r assets www/",
+    "sync": "npm run prepare:web && cap sync",
+    "add:ios": "npm run prepare:web && cap add ios",
+    "add:android": "npm run prepare:web && cap add android",
+    "open:ios": "cap open ios",
+    "open:android": "cap open android",
+    "run:ios": "npm run sync && cap run ios",
+    "run:android": "npm run sync && cap run android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor-community/speech-recognition": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
