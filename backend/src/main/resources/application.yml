@@ -24,7 +24,7 @@ spring:
 
   sql:
     init:
-      mode: always
+      mode: embedded
 
 gemini:
   api-key: ${GEMINI_API_KEY:}
