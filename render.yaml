@@ -1,0 +1,46 @@
+databases:
+  - name: support-agent-db
+    plan: free
+    databaseName: supportdb
+    user: supportuser
+
+services:
+  # Backend API
+  - type: web
+    name: support-agent-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: support-agent-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: support-agent-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: support-agent-db
+          property: password
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "*"
+    healthCheckPath: /api/health
+
+  # Frontend Static Site
+  - type: web
+    name: support-agent-ui
+    runtime: static
+    buildCommand: echo "No build needed"
+    staticPublishPath: ./frontend
+    plan: free
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600
