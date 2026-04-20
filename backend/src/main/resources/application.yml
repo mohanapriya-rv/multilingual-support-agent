@@ -1,24 +1,27 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   datasource:
-    url: jdbc:h2:mem:supportdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ''
+    url: ${DATABASE_URL:jdbc:h2:mem:supportdb}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
+
   h2:
     console:
       enabled: true
       path: /h2-console
+
   sql:
     init:
       mode: always
