@@ -312,8 +312,7 @@
         // Auto-detect API URL: use environment or fallback to localhost
         const API_BASE = window.location.hostname === 'localhost'
             ? 'http://localhost:8080/api'
-            : (window.API_URL || 'https://support-agent-api.onrender.com/api');
-
+            : (window.API_URL || 'https://multilingual-support-agent.onrender.com/api');
         let conversationHistory = [];
         let sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
         let hasConversationStarted = false;

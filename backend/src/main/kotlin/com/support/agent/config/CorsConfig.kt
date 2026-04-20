@@ -13,13 +13,14 @@ class CorsConfig {
     fun corsFilter(): CorsFilter {
         val config = CorsConfiguration().apply {
             allowCredentials = false
-            allowedOriginPatterns = listOf("*")
-            allowedHeaders = listOf("*")
-            allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            addAllowedOriginPattern("*")
+            addAllowedHeader("*")
+            addAllowedMethod("*")
+            addExposedHeader("*")
         }
         
         val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/api/**", config)
+        source.registerCorsConfiguration("/**", config)
         
         return CorsFilter(source)
     }

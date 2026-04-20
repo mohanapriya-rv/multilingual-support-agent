@@ -75,10 +75,11 @@ class AgentService(
         
         logger.info("Fetched data: $data")
 
-        // Step 5: Format response using Claude
+        // Step 5: Format response using Gemini (with FAQ context)
         val response = responseFormatterService.format(
             request.message,
             extractedIntent.detectedLanguage,
+            extractedIntent.intentCategory,  // NEW: Pass intent category for FAQ lookup
             data,
             request.conversationHistory
         )
