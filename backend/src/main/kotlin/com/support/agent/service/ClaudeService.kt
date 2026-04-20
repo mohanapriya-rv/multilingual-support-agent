@@ -15,7 +15,7 @@ import java.time.Duration
 @Service
 class ClaudeService(
     @Value("\${claude.api-key:}") private val apiKey: String,
-    @Value("\${claude.model:claude-3-haiku-20240307}") private val model: String,
+    @Value("\${claude.model:claude-sonnet-4-20250514}") private val model: String,
     @Value("\${claude.max-tokens:1024}") private val maxTokens: Int,
     @Value("\${claude.timeout-seconds:30}") private val timeoutSeconds: Long,
     private val objectMapper: ObjectMapper,
