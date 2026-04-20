@@ -34,6 +34,19 @@ class ClaudeService(
 You are an intent extraction system for a FINTECH & MUTUAL FUNDS customer support agent.
 Analyze the user's message and extract structured information.
 
+CRITICAL: Detect the ACTUAL language of the user's input message. 
+- If the message is in English (Latin script), set detected_language to "english"
+- If the message is in Hindi (Devanagari script), set detected_language to "hindi"
+- If the message is in Tamil (Tamil script), set detected_language to "tamil"
+- If the message is in Telugu (Telugu script), set detected_language to "telugu"
+- If the message is in Kannada (Kannada script), set detected_language to "kannada"
+- If the message is in Malayalam (Malayalam script), set detected_language to "malayalam"
+- If the message is in Bengali (Bengali script), set detected_language to "bengali"
+- If the message is in Marathi (Devanagari script), set detected_language to "marathi"
+- If the message is in Gujarati (Gujarati script), set detected_language to "gujarati"
+- If the message is in Punjabi (Gurmukhi script), set detected_language to "punjabi"
+- Default to "english" if uncertain
+
 IMPORTANT: You MUST respond with ONLY valid JSON, no other text.
 
 Supported languages: $supportedLanguages
@@ -41,48 +54,48 @@ Supported languages: $supportedLanguages
 === FINTECH & MUTUAL FUNDS SUPPORTED QUERIES (20+ types) ===
 
 1. ACCOUNT MANAGEMENT:
-   - account_balance: "मेरा बैलेंस कितना है?", "My wallet balance"
-   - account_status: "मेरा अकाउंट ब्लॉक क्यों है?", "Account blocked reason"
-   - account_statement: "मुझे स्टेटमेंट चाहिए", "Send account statement"
-   - update_profile: "मोबाइल नंबर बदलना है", "Update email/phone"
+   - account_balance: "My wallet balance", "मेरा बैलेंस कितना है?"
+   - account_status: "Account blocked reason", "मेरा अकाउंट ब्लॉक क्यों है?"
+   - account_statement: "Send account statement", "मुझे स्टेटमेंट चाहिए"
+   - update_profile: "Update email/phone", "मोबाइल नंबर बदलना है"
 
 2. MUTUAL FUNDS:
-   - portfolio_value: "मेरा पोर्टफोलियो कितना है?", "Show my investments"
-   - sip_status: "मेरा SIP status क्या है?", "SIP active or not"
-   - sip_start: "SIP शुरू करना है", "Start new SIP"
-   - sip_stop: "SIP बंद करना है", "Stop/pause SIP"
-   - sip_modify: "SIP amount बदलना है", "Change SIP amount"
-   - fund_nav: "NAV क्या है?", "Current NAV of fund"
-   - fund_returns: "रिटर्न कितना मिला?", "Show fund returns"
-   - fund_recommend: "कौन सा फंड अच्छा है?", "Suggest best fund"
-   - redemption: "पैसे निकालने हैं", "Withdraw/redeem funds"
-   - switch_fund: "फंड स्विच करना है", "Switch between funds"
+   - portfolio_value: "Show my investments", "मेरा पोर्टफोलियो कितना है?"
+   - sip_status: "SIP active or not", "मेरा SIP status क्या है?"
+   - sip_start: "Start new SIP", "SIP शुरू करना है"
+   - sip_stop: "Stop/pause SIP", "SIP बंद करना है"
+   - sip_modify: "Change SIP amount", "SIP amount बदलना है"
+   - fund_nav: "Current NAV of fund", "NAV क्या है?"
+   - fund_returns: "Show fund returns", "रिटर्न कितना मिला?"
+   - fund_recommend: "Suggest best fund", "कौन सा फंड अच्छा है?"
+   - redemption: "Withdraw/redeem funds", "पैसे निकालने हैं"
+   - switch_fund: "Switch between funds", "फंड स्विच करना है"
 
 3. TRANSACTIONS:
-   - recent_transactions: "हाल के ट्रांजैक्शन दिखाओ", "Recent transactions"
-   - failed_payment: "पेमेंट फेल हो गया", "Payment failed"
-   - refund_status: "रिफंड कब आएगा?", "Refund status"
-   - transaction_details: "ट्रांजैक्शन डिटेल्स", "Transaction details"
+   - recent_transactions: "Recent transactions", "हाल के ट्रांजैक्शन दिखाओ"
+   - failed_payment: "Payment failed", "पेमेंट फेल हो गया"
+   - refund_status: "Refund status", "रिफंड कब आएगा?"
+   - transaction_details: "Transaction details", "ट्रांजैक्शन डिटेल्स"
 
 4. KYC & COMPLIANCE:
-   - kyc_status: "KYC status क्या है?", "Check KYC"
-   - kyc_update: "KYC अपडेट करना है", "Update KYC documents"
-   - pan_link: "PAN link करना है", "Link PAN card"
-   - aadhaar_link: "आधार link करना है", "Link Aadhaar"
+   - kyc_status: "Check KYC", "KYC status क्या है?"
+   - kyc_update: "Update KYC documents", "KYC अपडेट करना है"
+   - pan_link: "Link PAN card", "PAN link करना है"
+   - aadhaar_link: "Link Aadhaar", "आधार link करना है"
 
 5. TAX & REPORTS:
-   - capital_gains: "कैपिटल गेन रिपोर्ट", "Capital gains statement"
-   - tax_statement: "टैक्स स्टेटमेंट चाहिए", "Tax saving proof"
-   - annual_report: "सालाना रिपोर्ट", "Annual investment report"
+   - capital_gains: "Capital gains statement", "कैपिटल गेन रिपोर्ट"
+   - tax_statement: "Tax saving proof", "टैक्स स्टेटमेंट चाहिए"
+   - annual_report: "Annual investment report", "सालाना रिपोर्ट"
 
 6. SUPPORT & ESCALATION:
-   - fraud_report: "धोखाधड़ी हुई है", "Fraud/unauthorized transaction"
-   - complaint: "शिकायत करनी है", "File complaint"
-   - speak_agent: "एजेंट से बात करनी है", "Talk to human"
+   - fraud_report: "Fraud/unauthorized transaction", "धोखाधड़ी हुई है"
+   - complaint: "File complaint", "शिकायत करनी है"
+   - speak_agent: "Talk to human", "एजेंट से बात करनी है"
 
 Response format (JSON only):
 {
-  "detected_language": "hindi|tamil|telugu|kannada|english",
+  "detected_language": "english|hindi|tamil|telugu|kannada|malayalam|bengali|marathi|gujarati|punjabi",
   "intent_category": "account|mutual_fund|transaction|kyc|tax|escalation|unknown",
   "intent_type": "specific_intent_from_above",
   "confidence": 0.0-1.0,
@@ -221,22 +234,42 @@ Rules:
     private fun getMockResponse(userMessage: String): String {
         val lowerMessage = userMessage.lowercase()
         
+        // Detect language from input
+        val detectedLanguage = detectLanguageFromInput(userMessage)
+        
         return when {
             lowerMessage.contains("kyc") || lowerMessage.contains("केवाईसी") || lowerMessage.contains("status") -> 
-                """{"detected_language":"hindi","intent_category":"kyc","intent_type":"status_check","confidence":0.9,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
+                """{"detected_language":"$detectedLanguage","intent_category":"kyc","intent_type":"status_check","confidence":0.9,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
             
             lowerMessage.contains("payment") || lowerMessage.contains("fail") || lowerMessage.contains("पेमेंट") || lowerMessage.contains("transaction") ->
-                """{"detected_language":"hindi","intent_category":"transaction","intent_type":"failed_payment","confidence":0.95,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
+                """{"detected_language":"$detectedLanguage","intent_category":"transaction","intent_type":"failed_payment","confidence":0.95,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
             
             lowerMessage.contains("balance") || lowerMessage.contains("बैलेंस") || lowerMessage.contains("account") ->
-                """{"detected_language":"hindi","intent_category":"account","intent_type":"balance_check","confidence":0.95,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
+                """{"detected_language":"$detectedLanguage","intent_category":"account","intent_type":"balance_check","confidence":0.95,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
             
             lowerMessage.contains("fraud") || lowerMessage.contains("धोखा") ->
-                """{"detected_language":"hindi","intent_category":"account","intent_type":"fraud_report","confidence":0.9,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":true,"escalation_reason":"Fraud mentioned by user","is_in_scope":true,"out_of_scope_reason":null}"""
+                """{"detected_language":"$detectedLanguage","intent_category":"account","intent_type":"fraud_report","confidence":0.9,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":true,"escalation_reason":"Fraud mentioned by user","is_in_scope":true,"out_of_scope_reason":null}"""
             
             else ->
-                """{"detected_language":"english","intent_category":"account","intent_type":"general_query","confidence":0.7,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
+                """{"detected_language":"$detectedLanguage","intent_category":"account","intent_type":"general_query","confidence":0.7,"entities":{"user_id":null,"transaction_id":null,"merchant":null,"amount":null},"requires_escalation":false,"escalation_reason":null,"is_in_scope":true,"out_of_scope_reason":null}"""
         }
+    }
+
+    private fun detectLanguageFromInput(text: String): String {
+        for (char in text) {
+            val codePoint = char.code
+            when {
+                codePoint in 0x0900..0x097F -> return "hindi"
+                codePoint in 0x0B80..0x0BFF -> return "tamil"
+                codePoint in 0x0C00..0x0C7F -> return "telugu"
+                codePoint in 0x0C80..0x0CFF -> return "kannada"
+                codePoint in 0x0D00..0x0D7F -> return "malayalam"
+                codePoint in 0x0980..0x09FF -> return "bengali"
+                codePoint in 0x0A00..0x0A7F -> return "punjabi"
+                codePoint in 0x0A80..0x0AFF -> return "gujarati"
+            }
+        }
+        return "english"
     }
 
     private fun getMockFormattedResponse(language: String, data: Map<String, Any>): String {

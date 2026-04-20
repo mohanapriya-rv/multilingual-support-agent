@@ -52,11 +52,16 @@ class IntentExtractorService(
 
     private fun detectLanguageFromUnicode(text: String): String {
         val languageCounts = mutableMapOf(
+            "english" to 0,
             "hindi" to 0,
             "tamil" to 0,
             "telugu" to 0,
             "kannada" to 0,
-            "english" to 0
+            "malayalam" to 0,
+            "bengali" to 0,
+            "marathi" to 0,
+            "gujarati" to 0,
+            "punjabi" to 0
         )
 
         for (char in text) {
@@ -66,10 +71,19 @@ class IntentExtractorService(
                 codePoint in 0x0B80..0x0BFF -> languageCounts["tamil"] = languageCounts["tamil"]!! + 1
                 codePoint in 0x0C00..0x0C7F -> languageCounts["telugu"] = languageCounts["telugu"]!! + 1
                 codePoint in 0x0C80..0x0CFF -> languageCounts["kannada"] = languageCounts["kannada"]!! + 1
+                codePoint in 0x0D00..0x0D7F -> languageCounts["malayalam"] = languageCounts["malayalam"]!! + 1
+                codePoint in 0x0980..0x09FF -> languageCounts["bengali"] = languageCounts["bengali"]!! + 1
+                codePoint in 0x0900..0x097F -> languageCounts["marathi"] = languageCounts["marathi"]!! + 1
+                codePoint in 0x0A80..0x0AFF -> languageCounts["gujarati"] = languageCounts["gujarati"]!! + 1
+                codePoint in 0x0A00..0x0A7F -> languageCounts["punjabi"] = languageCounts["punjabi"]!! + 1
                 codePoint in 0x0000..0x007F -> languageCounts["english"] = languageCounts["english"]!! + 1
             }
         }
 
-        return languageCounts.maxByOrNull { it.value }?.key ?: "english"
+        // Default to English if no specific script detected
+        val maxLang = languageCounts.maxByOrNull { it.value }?.key ?: "english"
+        // If English count is 0 but others are also 0, default to English
+        if (languageCounts["english"]!! > 0) return "english"
+        return maxLang
     }
 }
