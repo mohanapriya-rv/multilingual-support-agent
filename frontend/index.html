@@ -120,6 +120,18 @@
             letter-spacing: 0.5px;
         }
 
+        .listening-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.12);
+            color: #a7f3d0;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
         .hero-glow {
             background: radial-gradient(circle at 50% 40%, rgba(159, 124, 255, 0.32), rgba(25, 33, 64, 0.05));
         }
@@ -253,9 +265,16 @@
                                     <span class="text-[11px] font-semibold">AUTO</span>
                                 </span>
                                 <input type="text" id="messageInput" onkeypress="handleKeyPress(event)" placeholder="How can I help you today? Type in any language..." class="flex-1 bg-transparent text-white placeholder-[var(--text-secondary)] focus:outline-none text-sm md:text-base">
-                                <button class="p-2 text-[var(--text-secondary)] hover:text-white transition" aria-label="Mic">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3a3 3 0 00-3 3v6a3 3 0 006 0V6a3 3 0 00-3-3z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 10v2a7 7 0 01-14 0v-2m7 7v4m0 0h-3m3 0h3"/></svg>
-                                </button>
+                                <div class="flex items-center gap-2">
+                                    <button id="micBtn" class="p-2 text-[var(--text-secondary)] hover:text-white transition rounded-lg border border-transparent" aria-label="Mic" onclick="toggleMic()">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3a3 3 0 00-3 3v6a3 3 0 006 0V6a3 3 0 00-3-3z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 10v2a7 7 0 01-14 0v-2m7 7v4m0 0h-3m3 0h3"/></svg>
+                                    </button>
+                                    <span id="listeningIndicator" class="hidden listening-pill">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        <span>Listening…</span>
+                                        <button onclick="cancelMic(event)" class="text-xs text-emerald-100 hover:text-white">✕</button>
+                                    </span>
+                                </div>
                             </div>
                             <button onclick="sendMessage()" id="sendBtn" class="px-5 md:px-6 py-3 rounded-xl bg-gradient-to-r from-purple-400 via-purple-500 to-indigo-500 text-white font-semibold shadow-lg shadow-purple-900/40 hover:brightness-110 transition inline-flex items-center gap-2">
                                 <span id="sendText" class="whitespace-nowrap">Send</span>
@@ -813,6 +832,93 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Speech-to-text (browser-side)
+        let recognition = null;
+        let isListening = false;
+
+        function getRecognitionLang() {
+            const lang = document.getElementById('languageSelect').value;
+            const map = {
+                english: 'en-US',
+                hindi: 'hi-IN',
+                tamil: 'ta-IN',
+                telugu: 'te-IN',
+                kannada: 'kn-IN'
+            };
+            return map[lang] || 'en-US';
+        }
+
+        function ensureRecognition() {
+            if (recognition) return recognition;
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return null;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 1;
+            return recognition;
+        }
+
+        function toggleMic() {
+            if (isListening) {
+                stopMic();
+                return;
+            }
+            startMic();
+        }
+
+        function startMic() {
+            const rec = ensureRecognition();
+            if (!rec) {
+                alert('Speech recognition not supported in this browser.');
+                return;
+            }
+            rec.lang = getRecognitionLang();
+            const micBtn = document.getElementById('micBtn');
+            const indicator = document.getElementById('listeningIndicator');
+            const input = document.getElementById('messageInput');
+
+            micBtn.classList.add('border-emerald-400', 'bg-emerald-500/10', 'text-white');
+            if (indicator) indicator.classList.remove('hidden');
+            isListening = true;
+            rec.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                input.value = transcript.trim();
+                if (event.results[event.results.length - 1].isFinal) {
+                    stopMic(true);
+                }
+            };
+            rec.onerror = () => stopMic();
+            rec.onend = () => {
+                if (isListening) stopMic();
+            };
+            rec.start();
+        }
+
+        function stopMic(send = false) {
+            const rec = ensureRecognition();
+            const micBtn = document.getElementById('micBtn');
+            const indicator = document.getElementById('listeningIndicator');
+            const input = document.getElementById('messageInput');
+            isListening = false;
+            if (rec) {
+                try { rec.stop(); } catch (e) {}
+            }
+            micBtn.classList.remove('border-emerald-400', 'bg-emerald-500/10', 'text-white');
+            if (indicator) indicator.classList.add('hidden');
+            if (send && input.value.trim()) {
+                sendMessage();
+            }
+        }
+
+        function cancelMic(e) {
+            if (e) e.stopPropagation();
+            stopMic(false);
         }
 
         // Init UI
