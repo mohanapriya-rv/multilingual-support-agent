@@ -11,7 +11,8 @@ import java.time.Duration
 
 @Service
 class GeminiService(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val languageService: LanguageService  // NEW: Inject language service
 ) {
     private val logger = LoggerFactory.getLogger(GeminiService::class.java)
 
@@ -28,14 +29,16 @@ class GeminiService(
         .baseUrl("https://generativelanguage.googleapis.com/v1beta")
         .build()
 
-    companion object {
-        private val INTENT_EXTRACTION_PROMPT = """
+    // Dynamic prompt builder - languages loaded from database
+    private fun buildIntentExtractionPrompt(): String {
+        val supportedLanguages = languageService.getSupportedLanguagesForPrompt()
+        return """
 You are an intent extraction system for a FINTECH & MUTUAL FUNDS customer support agent.
 Analyze the user's message and extract structured information.
 
 IMPORTANT: You MUST respond with ONLY valid JSON, no other text.
 
-Supported languages: Hindi, Tamil, Telugu, Kannada, English
+Supported languages: $supportedLanguages
 
 === FINTECH & MUTUAL FUNDS SUPPORTED QUERIES (20+ types) ===
 
@@ -98,15 +101,22 @@ Response format (JSON only):
   "out_of_scope_reason": null
 }
 """.trimIndent()
+    }
 
-        private val RESPONSE_FORMATTING_PROMPT = """
+    // Dynamic response formatting prompt - greetings loaded from database
+    private fun buildResponseFormattingPrompt(): String {
+        val languages = languageService.getAllActiveLanguages()
+        val greetings = languages.joinToString(", ") { "${it.greeting} (${it.name})" }
+        val languageList = languages.joinToString("/") { it.name }
+        
+        return """
 You are a friendly multilingual FINTECH & MUTUAL FUNDS customer support agent.
 You work for a financial services company helping users with investments, SIPs, and transactions.
 
 Rules:
-1. Respond ONLY in the detected language (Hindi/Tamil/Telugu/Kannada/English)
+1. Respond ONLY in the detected language ($languageList)
 2. Be helpful, warm, and professional - this is about their money!
-3. Use appropriate Indian greetings (नमस्ते, வணக்கம், నమస్కారం, ನಮಸ್ಕಾರ)
+3. Use appropriate greetings based on language: $greetings
 4. Format currency in Indian format: ₹1,00,000 (with commas)
 5. Format percentages clearly: 12.5% returns
 6. Keep responses concise but informative
@@ -118,7 +128,7 @@ Rules:
 
     fun extractIntent(userMessage: String, conversationHistory: List<ConversationMessage>): String {
         val prompt = buildString {
-            append(INTENT_EXTRACTION_PROMPT)
+            append(buildIntentExtractionPrompt())  // Use dynamic prompt with languages from DB
             append("\n\nConversation history:\n")
             conversationHistory.takeLast(4).forEach {
                 append("${it.role}: ${it.content}\n")
@@ -134,16 +144,23 @@ Rules:
         userMessage: String,
         detectedLanguage: String,
         data: Map<String, Any>,
-        conversationHistory: List<ConversationMessage>
+        conversationHistory: List<ConversationMessage>,
+        faqContext: String = ""  // NEW: FAQ context from knowledge base
     ): String {
         val dataString = formatDataForPrompt(data)
         
         val prompt = buildString {
-            append(RESPONSE_FORMATTING_PROMPT)
+            append(buildResponseFormattingPrompt())  // Use dynamic prompt
+            
+            // Add FAQ context if available
+            if (faqContext.isNotBlank()) {
+                append("\n\n$faqContext")
+            }
+            
             append("\n\nDetected language: $detectedLanguage")
             append("\nUser's question: $userMessage")
             append("\n\nData from database:\n$dataString")
-            append("\n\nRespond naturally in $detectedLanguage:")
+            append("\n\nRespond naturally in $detectedLanguage. Use FAQ knowledge if relevant:")
         }
 
         return callGemini(prompt)
