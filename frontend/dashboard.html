@@ -123,6 +123,7 @@
                     <span class="text-[var(--text-secondary)] text-sm">Escalations</span>
                 </div>
                 <div id="escalations" class="text-3xl font-bold text-red-400">--</div>
+                <div id="escalationRate" class="text-sm text-[var(--text-secondary)] mt-1">--% rate</div>
             </div>
         </div>
 
@@ -179,6 +180,26 @@
                     <canvas id="intentChart"></canvas>
                 </div>
             </div>
+
+            <!-- Escalation Breakdown -->
+            <div class="chart-container rounded-2xl p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <span>🚨</span> Escalation Breakdown by Intent
+                </h3>
+                <div class="h-64">
+                    <canvas id="escalationIntentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Escalation by Language -->
+        <div class="chart-container rounded-2xl p-6 mb-8">
+            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>🌐</span> Escalations by Language
+            </h3>
+            <div class="h-64">
+                <canvas id="escalationLanguageChart"></canvas>
+            </div>
         </div>
 
         <!-- Language Breakdown Table -->
@@ -208,6 +229,8 @@
         const API_BASE = 'http://localhost:8080/api';
         let languageChart = null;
         let intentChart = null;
+        let escalationIntentChart = null;
+        let escalationLanguageChart = null;
 
         const languageColors = {
             english: '#3B82F6',
@@ -270,6 +293,7 @@
             document.getElementById('todayQueries').textContent = data.todayQueries || 0;
             document.getElementById('successRate').textContent = (data.successRate || 0).toFixed(1) + '%';
             document.getElementById('escalations').textContent = data.escalations || 0;
+            document.getElementById('escalationRate').textContent = (data.escalationRate || 0).toFixed(1) + '% rate';
             document.getElementById('kycQueries').textContent = data.kycQueries || 0;
             document.getElementById('investmentQueries').textContent = data.investmentQueries || 0;
             document.getElementById('transactionQueries').textContent = data.transactionQueries || 0;
@@ -291,6 +315,8 @@
             // Update charts
             updateLanguageChart(data.languageDistribution || {});
             updateIntentChart(data.intentDistribution || {});
+            updateEscalationIntentChart(data.escalationByIntent || {});
+            updateEscalationLanguageChart(data.escalationByLanguage || {});
             updateLanguageTable(data.languageDistribution || {}, data.totalQueries || 0);
         }
 
@@ -340,6 +366,76 @@
                         label: 'Queries',
                         data: values,
                         backgroundColor: ['#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateEscalationIntentChart(distribution) {
+            const ctx = document.getElementById('escalationIntentChart').getContext('2d');
+            const labels = Object.keys(distribution).map(i => i.charAt(0).toUpperCase() + i.slice(1).replace('_', ' '));
+            const values = Object.values(distribution);
+
+            if (escalationIntentChart) escalationIntentChart.destroy();
+
+            escalationIntentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateEscalationLanguageChart(distribution) {
+            const ctx = document.getElementById('escalationLanguageChart').getContext('2d');
+            const labels = Object.keys(distribution).map(l => languageNames[l] || l);
+            const values = Object.values(distribution);
+            const colors = Object.keys(distribution).map(l => languageColors[l] || '#888');
+
+            if (escalationLanguageChart) escalationLanguageChart.destroy();
+
+            escalationLanguageChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Escalations',
+                        data: values,
+                        backgroundColor: colors,
                         borderRadius: 8
                     }]
                 },

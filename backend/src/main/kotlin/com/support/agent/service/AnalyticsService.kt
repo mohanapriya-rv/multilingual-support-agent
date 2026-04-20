@@ -52,6 +52,7 @@ class AnalyticsService(
         val end = endDate?.plusDays(1)?.atStartOfDay() ?: today.plusDays(1).atStartOfDay()
         
         val dateRangeEvents = analyticsRepository.findByTimestampBetween(start, end)
+        val escalatedEvents = dateRangeEvents.filter { it.escalated }
         
         return DashboardStats(
             totalConversations = dateRangeEvents.map { it.sessionId }.distinct().size.toLong(),
@@ -60,7 +61,10 @@ class AnalyticsService(
             kycQueries = dateRangeEvents.count { it.intentCategory == "kyc" }.toLong(),
             investmentQueries = dateRangeEvents.count { it.intentCategory == "mutual_fund" }.toLong(),
             transactionQueries = dateRangeEvents.count { it.intentCategory == "transaction" }.toLong(),
-            escalations = dateRangeEvents.count { it.escalated }.toLong(),
+            escalations = escalatedEvents.size.toLong(),
+            escalationRate = calculateEscalationRate(dateRangeEvents),
+            escalationByIntent = getEscalationByIntent(escalatedEvents),
+            escalationByLanguage = getEscalationByLanguage(escalatedEvents),
             languageDistribution = getLanguageDistribution(dateRangeEvents),
             inputTypeDistribution = getInputTypeDistribution(dateRangeEvents),
             intentDistribution = getIntentDistribution(dateRangeEvents),
@@ -97,6 +101,26 @@ class AnalyticsService(
         if (total == 0) return 100.0
         val successful = eventList.count { it.responseGiven }
         return (successful.toDouble() / total.toDouble()) * 100
+    }
+
+    fun calculateEscalationRate(events: List<AnalyticsEvent>? = null): Double {
+        val eventList = events ?: analyticsRepository.findAll()
+        val total = eventList.size
+        if (total == 0) return 0.0
+        val escalated = eventList.count { it.escalated }
+        return (escalated.toDouble() / total.toDouble()) * 100
+    }
+
+    fun getEscalationByIntent(events: List<AnalyticsEvent>): Map<String, Long> {
+        return events
+            .groupBy { it.intentCategory }
+            .mapValues { it.value.size.toLong() }
+    }
+
+    fun getEscalationByLanguage(events: List<AnalyticsEvent>): Map<String, Long> {
+        return events
+            .groupBy { it.language }
+            .mapValues { it.value.size.toLong() }
     }
 
     fun getDailyReport(): DailyReport {
@@ -137,6 +161,9 @@ data class DashboardStats(
     val investmentQueries: Long,
     val transactionQueries: Long,
     val escalations: Long,
+    val escalationRate: Double,
+    val escalationByIntent: Map<String, Long>,
+    val escalationByLanguage: Map<String, Long>,
     val languageDistribution: Map<String, Long>,
     val inputTypeDistribution: Map<String, Long>,
     val intentDistribution: Map<String, Long>,
