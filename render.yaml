@@ -9,9 +9,8 @@ services:
   - type: web
     name: support-agent-api
     runtime: docker
-    rootDir: ./backend
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
