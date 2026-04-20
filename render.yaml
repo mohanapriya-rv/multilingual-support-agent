@@ -27,7 +27,7 @@ services:
         fromDatabase:
           name: support-agent-db
           property: password
-      - key: ANTHROPIC_API_KEY
+      - key: GEMINI_API_KEY
         sync: false
       - key: CORS_ORIGINS
         value: "*"

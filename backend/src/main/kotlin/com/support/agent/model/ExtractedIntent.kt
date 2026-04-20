@@ -38,5 +38,11 @@ data class IntentEntities(
     
     val merchant: String? = null,
     
-    val amount: Double? = null
+    val amount: Double? = null,
+    
+    @JsonProperty("fund_name")
+    val fundName: String? = null,
+    
+    @JsonProperty("sip_id")
+    val sipId: String? = null
 )

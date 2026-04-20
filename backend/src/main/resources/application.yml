@@ -23,10 +23,9 @@ spring:
     init:
       mode: always
 
-claude:
-  api-key: ${ANTHROPIC_API_KEY:}
-  model: claude-haiku-4-5
-  max-tokens: 1024
+gemini:
+  api-key: ${GEMINI_API_KEY:}
+  model: gemini-2.5-flash
   timeout-seconds: 30
 
 cors:

@@ -19,12 +19,10 @@ spring:
     init:
       mode: never
 
-claude:
-  api-key: ${ANTHROPIC_API_KEY:}
-  model: claude-haiku-4-5
-  base-url: https://api.anthropic.com
+gemini:
+  api-key: ${GEMINI_API_KEY:}
+  model: gemini-1.5-flash
   timeout-seconds: 30
-  max-tokens: 1024
 
 cors:
   allowed-origins: ${CORS_ORIGINS:*}

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ResponseFormatterService(
-    private val claudeService: ClaudeService
+    private val geminiService: GeminiService
 ) {
     private val logger = LoggerFactory.getLogger(ResponseFormatterService::class.java)
 
@@ -19,7 +19,7 @@ class ResponseFormatterService(
         logger.info("Formatting response in $detectedLanguage with data: $data")
         
         return try {
-            claudeService.formatResponse(userMessage, detectedLanguage, data, conversationHistory)
+            geminiService.formatResponse(userMessage, detectedLanguage, data, conversationHistory)
         } catch (e: Exception) {
             logger.error("Response formatting failed: ${e.message}", e)
             getFallbackResponse(detectedLanguage, data)

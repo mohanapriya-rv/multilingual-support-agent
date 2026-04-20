@@ -1,9 +1,7 @@
 package com.support.agent.service
 
 import com.support.agent.model.ExtractedIntent
-import com.support.agent.repository.KycRepository
-import com.support.agent.repository.TransactionRepository
-import com.support.agent.repository.UserRepository
+import com.support.agent.repository.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -13,10 +11,14 @@ import java.time.format.DateTimeFormatter
 class DataFetcherService(
     private val userRepository: UserRepository,
     private val kycRepository: KycRepository,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val mutualFundRepository: MutualFundRepository,
+    private val userInvestmentRepository: UserInvestmentRepository,
+    private val sipRepository: SipRepository
 ) {
     private val logger = LoggerFactory.getLogger(DataFetcherService::class.java)
     private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm")
+    private val dateOnlyFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
 
     fun fetch(userId: String, intent: ExtractedIntent): Map<String, Any> {
         logger.info("Fetching data for userId=$userId, category=${intent.intentCategory}, type=${intent.intentType}")
@@ -25,8 +27,170 @@ class DataFetcherService(
             "kyc" -> fetchKycData(userId, intent)
             "transaction" -> fetchTransactionData(userId, intent)
             "account" -> fetchAccountData(userId, intent)
+            "mutual_fund" -> fetchMutualFundData(userId, intent)
+            "tax" -> fetchTaxData(userId, intent)
             else -> emptyMap()
         }
+    }
+    
+    private fun fetchMutualFundData(userId: String, intent: ExtractedIntent): Map<String, Any> {
+        val intentType = intent.intentType?.lowercase() ?: ""
+        
+        return when {
+            intentType.contains("portfolio") -> fetchPortfolioValue(userId)
+            intentType.contains("sip_status") || intentType.contains("sip") && intentType.contains("status") -> fetchSipStatus(userId)
+            intentType.contains("sip") -> fetchSipDetails(userId)
+            intentType.contains("nav") -> fetchFundNav(intent.entities.fundName)
+            intentType.contains("return") -> fetchFundReturns(userId)
+            intentType.contains("recommend") -> fetchFundRecommendations()
+            intentType.contains("redemption") || intentType.contains("withdraw") -> fetchRedemptionInfo(userId)
+            else -> fetchPortfolioValue(userId)
+        }
+    }
+    
+    private fun fetchPortfolioValue(userId: String): Map<String, Any> {
+        val investments = userInvestmentRepository.findByUserId(userId)
+        val totalValue = userInvestmentRepository.getTotalPortfolioValue(userId) ?: java.math.BigDecimal.ZERO
+        val totalInvested = userInvestmentRepository.getTotalInvestedAmount(userId) ?: java.math.BigDecimal.ZERO
+        val returns = totalValue.subtract(totalInvested)
+        val returnsPercent = if (totalInvested > java.math.BigDecimal.ZERO) 
+            returns.multiply(java.math.BigDecimal(100)).divide(totalInvested, 2, java.math.RoundingMode.HALF_UP)
+        else java.math.BigDecimal.ZERO
+        
+        if (investments.isEmpty()) {
+            return mapOf("message" to "No investments found. Start investing today!")
+        }
+        
+        val investmentList = investments.map { inv ->
+            "${inv.fundName}: ₹${inv.currentValue} (Invested: ₹${inv.investedAmount})"
+        }
+        
+        return mapOf(
+            "total_portfolio_value" to "₹${totalValue}",
+            "total_invested" to "₹${totalInvested}",
+            "total_returns" to "₹${returns} (${returnsPercent}%)",
+            "number_of_funds" to investments.size,
+            "investments" to investmentList.joinToString("\n")
+        )
+    }
+    
+    private fun fetchSipStatus(userId: String): Map<String, Any> {
+        val activeSips = sipRepository.findByUserIdAndStatus(userId, "active")
+        val allSips = sipRepository.findByUserId(userId)
+        
+        if (allSips.isEmpty()) {
+            return mapOf("message" to "No SIPs found. Start a SIP today with as low as ₹500!")
+        }
+        
+        val sipList = allSips.map { sip ->
+            "${sip.fundName}: ₹${sip.amount}/${sip.frequency} - Status: ${sip.status.uppercase()}, Next: ${sip.nextDate.format(dateOnlyFormatter)}"
+        }
+        
+        return mapOf(
+            "active_sips" to activeSips.size,
+            "total_sips" to allSips.size,
+            "monthly_sip_amount" to "₹${activeSips.sumOf { it.amount }}",
+            "sip_details" to sipList.joinToString("\n")
+        )
+    }
+    
+    private fun fetchSipDetails(userId: String): Map<String, Any> {
+        val sips = sipRepository.findByUserId(userId)
+        
+        if (sips.isEmpty()) {
+            return mapOf("message" to "No SIPs found")
+        }
+        
+        val sipList = sips.map { sip ->
+            "SIP ID: ${sip.id}\nFund: ${sip.fundName}\nAmount: ₹${sip.amount}\nStatus: ${sip.status}\nNext Date: ${sip.nextDate}\nInstallments: ${sip.completedInstallments}/${sip.totalInstallments}"
+        }
+        
+        return mapOf(
+            "sip_count" to sips.size,
+            "sip_details" to sipList.joinToString("\n\n")
+        )
+    }
+    
+    private fun fetchFundNav(fundName: String?): Map<String, Any> {
+        val funds = if (fundName != null) {
+            mutualFundRepository.findAll().filter { it.name.contains(fundName, ignoreCase = true) }
+        } else {
+            mutualFundRepository.findAll().take(5)
+        }
+        
+        if (funds.isEmpty()) {
+            return mapOf("message" to "Fund not found. Please check the fund name.")
+        }
+        
+        val fundList = funds.map { fund ->
+            "${fund.name}: NAV ₹${fund.nav} (1Y: ${fund.oneYearReturn}%)"
+        }
+        
+        return mapOf(
+            "nav_details" to fundList.joinToString("\n")
+        )
+    }
+    
+    private fun fetchFundReturns(userId: String): Map<String, Any> {
+        val investments = userInvestmentRepository.findByUserId(userId)
+        
+        if (investments.isEmpty()) {
+            return mapOf("message" to "No investments found")
+        }
+        
+        val returnsList = investments.map { inv ->
+            val returnAmount = inv.currentValue.subtract(inv.investedAmount)
+            val returnPercent = returnAmount.multiply(java.math.BigDecimal(100))
+                .divide(inv.investedAmount, 2, java.math.RoundingMode.HALF_UP)
+            "${inv.fundName}: ${if (returnAmount >= java.math.BigDecimal.ZERO) "+" else ""}₹${returnAmount} (${returnPercent}%)"
+        }
+        
+        return mapOf(
+            "returns_summary" to returnsList.joinToString("\n")
+        )
+    }
+    
+    private fun fetchFundRecommendations(): Map<String, Any> {
+        val topFunds = mutualFundRepository.findTopPerformers().take(5)
+        
+        val recommendations = topFunds.map { fund ->
+            "${fund.name} (${fund.category})\n  • 1Y Return: ${fund.oneYearReturn}%\n  • Risk: ${fund.riskLevel}\n  • Min SIP: ₹${fund.minSipAmount}"
+        }
+        
+        return mapOf(
+            "top_funds" to recommendations.joinToString("\n\n"),
+            "disclaimer" to "Past performance doesn't guarantee future returns. Please read scheme documents."
+        )
+    }
+    
+    private fun fetchRedemptionInfo(userId: String): Map<String, Any> {
+        val investments = userInvestmentRepository.findByUserId(userId)
+        val totalValue = userInvestmentRepository.getTotalPortfolioValue(userId) ?: java.math.BigDecimal.ZERO
+        
+        if (investments.isEmpty()) {
+            return mapOf("message" to "No investments available for redemption")
+        }
+        
+        return mapOf(
+            "redeemable_amount" to "₹${totalValue}",
+            "funds_count" to investments.size,
+            "note" to "Redemption typically takes 2-3 business days. Exit load may apply for investments < 1 year."
+        )
+    }
+    
+    private fun fetchTaxData(userId: String, intent: ExtractedIntent): Map<String, Any> {
+        val investments = userInvestmentRepository.findByUserId(userId)
+        val totalInvested = userInvestmentRepository.getTotalInvestedAmount(userId) ?: java.math.BigDecimal.ZERO
+        val totalValue = userInvestmentRepository.getTotalPortfolioValue(userId) ?: java.math.BigDecimal.ZERO
+        val capitalGains = totalValue.subtract(totalInvested)
+        
+        return mapOf(
+            "total_invested" to "₹${totalInvested}",
+            "current_value" to "₹${totalValue}",
+            "unrealized_gains" to "₹${capitalGains}",
+            "tax_note" to "LTCG (>1 year) taxed at 10% above ₹1 lakh. STCG (<1 year) taxed at 15%.",
+            "statement_available" to "Capital Gains statement can be downloaded from the app."
+        )
     }
 
     private fun fetchKycData(userId: String, intent: ExtractedIntent): Map<String, Any> {
