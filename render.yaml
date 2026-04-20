@@ -8,9 +8,10 @@ services:
   # Backend API
   - type: web
     name: support-agent-api
-    runtime: docker
-    dockerfilePath: backend/Dockerfile
-    dockerContext: backend
+    runtime: gradle
+    rootDir: backend
+    buildCommand: ./gradlew bootJar
+    startCommand: java -jar build/libs/*.jar
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
