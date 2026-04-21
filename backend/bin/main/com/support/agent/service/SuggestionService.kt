@@ -81,12 +81,41 @@ class SuggestionService {
         "punjabi" to listOf("KYC ਸਥਿਤੀ", "ਪੋਰਟਫੋਲੀਓ ਦੇਖੋ", "ਲੈਣ-ਦੇਣ ਟ੍ਰੈਕ", "ਸਪੋਰਟ ਸੰਪਰਕ")
     )
 
-    fun getSuggestions(intentCategory: String?, language: String): List<String> {
+    fun getSuggestions(intentCategory: String?, language: String, kycStatus: String? = null): List<String> {
         val lang = language.lowercase()
         val category = intentCategory?.lowercase() ?: "default"
-        
-        return suggestions[category]?.get(lang) 
-            ?: defaultSuggestions[lang] 
+
+        // If KYC intent and status is provided, return context-aware suggestions
+        if (category == "kyc" && kycStatus != null) {
+            return getKycStatusSuggestions(kycStatus.lowercase(), lang)
+        }
+
+        return suggestions[category]?.get(lang)
+            ?: defaultSuggestions[lang]
             ?: defaultSuggestions["english"]!!
+    }
+
+    private fun getKycStatusSuggestions(status: String, language: String): List<String> {
+        return when (status) {
+            "pending" -> when (language) {
+                "tamil" -> listOf("ஆவணங்கள் பதிவேற்றம்", "PAN புதுப்பிக்க", "ஆதார் இணைக்க", "புகைப்படுத்தம் செய்ய", "KYC நிலை சரிபார்க்க")
+                "hindi" -> listOf("दस्तावेज़ अपलोड करें", "PAN अपडेट करें", "आधार लिंक करें", "सत्यापन करें", "KYC स्थिति जांचें")
+                "english" -> listOf("Upload documents", "Update PAN", "Link Aadhaar", "Complete verification", "Check KYC status")
+                else -> listOf("Upload documents", "Update PAN", "Link Aadhaar", "Complete verification", "Check KYC status")
+            }
+            "rejected" -> when (language) {
+                "tamil" -> listOf("ஆவணங்கள் மீண்டும் பதிவேற்றம்", "PAN சரிசெய்ய", "பெயர் மாற்றம் புகார்", "ஆதார் சரிசெய்ய", "ஏன் நிராகரிக்கப்பட்டது?")
+                "hindi" -> listOf("दस्तावेज़ फिर से जमा करें", "PAN सुधारें", "नाम मिसमैच शिकायत", "आधार सुधारें", "क्यों अस्वीकृत किया गया?")
+                "english" -> listOf("Re-submit documents", "Correct PAN", "Name mismatch complaint", "Correct Aadhaar", "Why was it rejected?")
+                else -> listOf("Re-submit documents", "Correct PAN", "Name mismatch complaint", "Correct Aadhaar", "Why was it rejected?")
+            }
+            "verified" -> when (language) {
+                "tamil" -> listOf("ஆவணங்கள் புதுப்பிக்க", "முகவரி மாற்றம்", "பெயர் மாற்றம்", "மொபைல் மாற்றம்", "KYC நிலை சரிபார்க்க")
+                "hindi" -> listOf("दस्तावेज़ अपडेट करें", "पता बदलें", "नाम बदलें", "मोबाइल बदलें", "KYC स्थिति जांचें")
+                "english" -> listOf("Update documents", "Change address", "Change name", "Update mobile", "Check KYC status")
+                else -> listOf("Update documents", "Change address", "Change name", "Update mobile", "Check KYC status")
+            }
+            else -> suggestions["kyc"]?.get(language) ?: defaultSuggestions[language] ?: defaultSuggestions["english"]!!
+        }
     }
 }

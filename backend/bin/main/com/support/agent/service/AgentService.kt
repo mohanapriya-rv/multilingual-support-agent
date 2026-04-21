@@ -121,9 +121,15 @@ class AgentService(
         )
 
         // Step 6: Get context-aware suggestions in detected language
+        val kycStatus = if (extractedIntent.intentCategory == "kyc") {
+            val kycData = data["kyc_status"] as? String
+            kycData
+        } else null
+
         val suggestions = suggestionService.getSuggestions(
             extractedIntent.intentCategory,
-            extractedIntent.detectedLanguage
+            extractedIntent.detectedLanguage,
+            kycStatus
         )
 
         // Step 7: Track analytics
