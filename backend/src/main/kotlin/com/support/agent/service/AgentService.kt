@@ -126,10 +126,16 @@ class AgentService(
             kycData
         } else null
 
+        val transactionStatus = if (extractedIntent.intentCategory == "transaction") {
+            val txnData = data["status"] as? String
+            txnData
+        } else null
+
         val suggestions = suggestionService.getSuggestions(
             extractedIntent.intentCategory,
             extractedIntent.detectedLanguage,
-            kycStatus
+            kycStatus,
+            transactionStatus
         )
 
         // Step 7: Track analytics

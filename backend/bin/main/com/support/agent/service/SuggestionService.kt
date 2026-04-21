@@ -81,13 +81,18 @@ class SuggestionService {
         "punjabi" to listOf("KYC ਸਥਿਤੀ", "ਪੋਰਟਫੋਲੀਓ ਦੇਖੋ", "ਲੈਣ-ਦੇਣ ਟ੍ਰੈਕ", "ਸਪੋਰਟ ਸੰਪਰਕ")
     )
 
-    fun getSuggestions(intentCategory: String?, language: String, kycStatus: String? = null): List<String> {
+    fun getSuggestions(intentCategory: String?, language: String, kycStatus: String? = null, transactionStatus: String? = null): List<String> {
         val lang = language.lowercase()
         val category = intentCategory?.lowercase() ?: "default"
 
         // If KYC intent and status is provided, return context-aware suggestions
         if (category == "kyc" && kycStatus != null) {
             return getKycStatusSuggestions(kycStatus.lowercase(), lang)
+        }
+
+        // If transaction intent and status is provided, return context-aware suggestions
+        if (category == "transaction" && transactionStatus != null) {
+            return getTransactionStatusSuggestions(transactionStatus.lowercase(), lang)
         }
 
         return suggestions[category]?.get(lang)
@@ -116,6 +121,30 @@ class SuggestionService {
                 else -> listOf("Update documents", "Change address", "Change name", "Update mobile", "Check KYC status")
             }
             else -> suggestions["kyc"]?.get(language) ?: defaultSuggestions[language] ?: defaultSuggestions["english"]!!
+        }
+    }
+
+    private fun getTransactionStatusSuggestions(status: String, language: String): List<String> {
+        return when (status) {
+            "completed" -> when (language) {
+                "tamil" -> listOf("ரசீது டவுன்லோட்", "மறுபயன் பரிவர்த்தனை", "சமீபத்திய பரிவர்த்தனை", "வரலாறு பார்க்க", "வங்கி கணக்கு சரிபார்க்க")
+                "hindi" -> listOf("रसीद डाउनलोड", "पुनः लेनदेन", "हाल के लेन-देन", "इतिहास देखें", "बैंक खाता जांचें")
+                "english" -> listOf("Download receipt", "Repeat transaction", "Recent transactions", "View history", "Check bank account")
+                else -> listOf("Download receipt", "Repeat transaction", "Recent transactions", "View history", "Check bank account")
+            }
+            "failed" -> when (language) {
+                "tamil" -> listOf("பேமெண்ட் மீண்டும் முயற்சி", "ஏன் தோல்வியடைந்தது?", "வங்கி சரிபார்க்க", "ரீஃபண்ட் நிலை", "ஆதரவு தொடர்பு")
+                "hindi" -> listOf("भुगतान पुनः प्रयास", "विफल क्यों हुआ?", "बैंक जांचें", "रिफंड स्थिति", "सहायता संपर्क")
+                "english" -> listOf("Retry payment", "Why did it fail?", "Check bank", "Refund status", "Contact support")
+                else -> listOf("Retry payment", "Why did it fail?", "Check bank", "Refund status", "Contact support")
+            }
+            "refunded" -> when (language) {
+                "tamil" -> listOf("ரீஃபண்ட் நிலை சரிபார்க்க", "வங்கி கணக்கு சரிபார்க்க", "ரசீது டவுன்லோட்", "புதிய பரிவர்த்தனை", "ஆதரவு தொடர்பு")
+                "hindi" -> listOf("रिफंड स्थिति जांचें", "बैंक खाता जांचें", "रसीद डाउनलोड", "नया लेनदेन", "सहायता संपर्क")
+                "english" -> listOf("Check refund status", "Verify bank account", "Download receipt", "New transaction", "Contact support")
+                else -> listOf("Check refund status", "Verify bank account", "Download receipt", "New transaction", "Contact support")
+            }
+            else -> suggestions["transaction"]?.get(language) ?: defaultSuggestions[language] ?: defaultSuggestions["english"]!!
         }
     }
 }
