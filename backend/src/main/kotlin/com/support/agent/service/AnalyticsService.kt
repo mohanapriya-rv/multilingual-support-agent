@@ -53,10 +53,13 @@ class AnalyticsService(
 
         val dateRangeEvents = analyticsRepository.findByTimestampBetween(start, end)
         val escalatedEvents = dateRangeEvents.filter { it.escalated }
+        val allEvents = analyticsRepository.findAll()
 
         return DashboardStats(
             totalConversations = dateRangeEvents.map { it.sessionId }.distinct().size.toLong(),
             totalQueries = dateRangeEvents.size.toLong(),
+            allTimeQueries = allEvents.size.toLong(),
+            allTimeConversations = allEvents.map { it.sessionId }.distinct().size.toLong(),
             todayQueries = analyticsRepository.countByTimestampAfter(today.atStartOfDay()),
             kycQueries = dateRangeEvents.count { it.intentCategory == "kyc" }.toLong(),
             investmentQueries = dateRangeEvents.count { it.intentCategory == "mutual_fund" }.toLong(),
@@ -156,6 +159,8 @@ class AnalyticsService(
 data class DashboardStats(
     val totalConversations: Long,
     val totalQueries: Long,
+    val allTimeQueries: Long,
+    val allTimeConversations: Long,
     val todayQueries: Long,
     val kycQueries: Long,
     val investmentQueries: Long,
