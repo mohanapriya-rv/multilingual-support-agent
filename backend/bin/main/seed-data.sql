@@ -103,7 +103,7 @@ INSERT INTO kyc_records (user_id, status, documents_submitted, pending_documents
 INSERT INTO transactions (id, user_id, amount, merchant, status, failure_reason, refund_status, refund_date, created_at) VALUES
 -- Successful transactions
 ('TXN001', 'USR001', 2500.00, 'Amazon India', 'completed', NULL, NULL, NULL, '2024-01-15 10:30:00'),
-('TXN002', 'USR001', 1500.00, 'Swiggy', 'completed', NULL, NULL, NULL, '2024-01-18 19:45:00'),
+('TXN002', 'USR001', 1500.00, 'Online Merchant', 'completed', NULL, NULL, NULL, '2024-01-18 19:45:00'),
 ('TXN003', 'USR001', 5000.00, 'Flipkart', 'completed', NULL, NULL, NULL, '2024-01-20 14:00:00'),
 ('TXN004', 'USR002', 3200.00, 'BigBasket', 'completed', NULL, NULL, NULL, '2024-01-16 11:15:00'),
 ('TXN005', 'USR002', 850.00, 'Zomato', 'completed', NULL, NULL, NULL, '2024-01-19 20:30:00'),
@@ -114,7 +114,7 @@ INSERT INTO transactions (id, user_id, amount, merchant, status, failure_reason,
 ('TXN008', 'USR001', 8000.00, 'Croma', 'failed', 'Insufficient balance', NULL, NULL, '2024-01-22 13:30:00'),
 ('TXN009', 'USR004', 4500.00, 'Amazon India', 'failed', 'Card declined by issuer', NULL, NULL, '2024-01-21 15:00:00'),
 ('TXN010', 'USR011', 6000.00, 'Flipkart', 'failed', 'Transaction timeout', NULL, NULL, '2024-01-20 18:15:00'),
-('TXN011', 'USR021', 3500.00, 'Swiggy', 'failed', 'OTP verification failed', NULL, NULL, '2024-01-19 21:00:00'),
+('TXN011', 'USR021', 3500.00, 'Online Merchant', 'failed', 'OTP verification failed', NULL, NULL, '2024-01-19 21:00:00'),
 ('TXN012', 'USR031', 12000.00, 'BookMyShow', 'failed', 'Daily limit exceeded', NULL, NULL, '2024-01-18 17:30:00'),
 
 -- Refunded transactions

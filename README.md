@@ -145,7 +145,7 @@ Send a message to the chatbot.
 ```json
 {
   "userId": "USR001",
-  "message": "என் Swiggy பேமெண்ட் fail ஆனது",
+  "message": "என் பரிவர்த்தனை fail ஆனது",
   "sessionId": "sess_def456",
   "conversationHistory": [],
   "inputType": "text"
@@ -156,7 +156,7 @@ Send a message to the chatbot.
 ```json
 {
   "sessionId": "sess_def456",
-  "response": "உங்கள் Swiggy பேமெண்ட் தோல்வியடைந்தது. காரணம்: Insufficient balance. பணம் சேர்த்த பிறகு மீண்டும் முயற்சி செய்யவும்.",
+  "response": "உங்கள் பரிவர்த்தனை தோல்வியடைந்தது. காரணம்: Insufficient balance. பணம் சேர்த்த பிறகு மீண்டும் முயற்சி செய்யவும்.",
   "detectedLanguage": "tamil",
   "intentCategory": "transaction",
   "intentType": "failure_reason",
@@ -307,7 +307,7 @@ Health check endpoint.
 
 ### 2. Transaction Failure (Tamil)
 **User:** USR001
-**Query:** `என் Swiggy பேமெண்ட் fail ஆனது`
+**Query:** `என் பரிவர்த்தனை fail ஆனது`
 **Intent:** transaction/failure_reason
 **Response:** Failure reason and next steps
 
