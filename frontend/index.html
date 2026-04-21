@@ -1011,6 +1011,10 @@
         let recognition = null;
         let isListening = false;
         let capacitorSpeechListener = null;
+        let capacitorResultListener = null;
+        let nativeStopTimer = null;
+        let nativeHardStopTimer = null;
+        let nativeTranscript = '';
 
         function isCapacitorNative() {
             return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
@@ -1152,12 +1156,57 @@
                 if (indicator) indicator.classList.remove('hidden');
                 isListening = true;
 
+                if (nativeStopTimer) {
+                    clearTimeout(nativeStopTimer);
+                    nativeStopTimer = null;
+                }
+                if (nativeHardStopTimer) {
+                    clearTimeout(nativeHardStopTimer);
+                    nativeHardStopTimer = null;
+                }
+                nativeTranscript = '';
                 if (capacitorSpeechListener && capacitorSpeechListener.remove) {
                     try { capacitorSpeechListener.remove(); } catch (e) {}
                 }
+                if (capacitorResultListener && capacitorResultListener.remove) {
+                    try { capacitorResultListener.remove(); } catch (e) {}
+                }
+
+                const scheduleStop = (send = false, delay = 800) => {
+                    if (nativeStopTimer) {
+                        clearTimeout(nativeStopTimer);
+                        nativeStopTimer = null;
+                    }
+                    nativeStopTimer = setTimeout(() => {
+                        stopMicNative(send).catch((err) => console.error('stopMicNative error', err));
+                    }, delay);
+                };
+
                 capacitorSpeechListener = plugin.addListener('partialResults', (data) => {
                     const matches = (data && data.matches) || [];
-                    if (matches.length) input.value = matches[0];
+                    const transcript = matches.find((m) => m && m.trim()) || '';
+                    if (transcript) {
+                        input.value = transcript;
+                        nativeTranscript = transcript;
+                        // Stop after a short pause; if no final result arrives, send the partial.
+                        scheduleStop(true, 1200);
+                    }
+                });
+                capacitorResultListener = plugin.addListener('result', (data) => {
+                    const matches = (data && data.matches) || [];
+                    const transcript = matches.find((m) => m && m.trim()) || '';
+                    if (transcript) {
+                        input.value = transcript;
+                        nativeTranscript = transcript;
+                        if (nativeStopTimer) {
+                            clearTimeout(nativeStopTimer);
+                            nativeStopTimer = null;
+                        }
+                        // Send immediately on final result
+                        stopMicNative(true).catch((err) => console.error('stopMicNative result error', err));
+                        return;
+                    }
+                    scheduleStop();
                 });
                 await plugin.start({
                     language: getRecognitionLang(),
@@ -1165,7 +1214,12 @@
                     partialResults: true,
                     popup: false
                 });
-                stopMicNative(true);
+
+                // Safety: hard stop after 8s to avoid stuck mic
+                nativeHardStopTimer = setTimeout(() => {
+                    console.warn('Native STT hard stop fired');
+                    stopMicNative(!!nativeTranscript).catch((err) => console.error('hard stop stopMicNative error', err));
+                }, 8000);
             } catch (err) {
                 console.error('Native STT error', err);
                 stopMicNative(false);
@@ -1177,16 +1231,44 @@
             const micBtn = document.getElementById('micBtn');
             const indicator = document.getElementById('listeningIndicator');
             const input = document.getElementById('messageInput');
-            isListening = false;
-            try { if (plugin) await plugin.stop(); } catch (e) {}
-            if (capacitorSpeechListener && capacitorSpeechListener.remove) {
-                try { capacitorSpeechListener.remove(); } catch (e) {}
-                capacitorSpeechListener = null;
-            }
-            micBtn.classList.remove('border-emerald-400', 'bg-emerald-500/10', 'text-white');
-            if (indicator) indicator.classList.add('hidden');
-            if (send && input.value.trim()) {
-                sendMessage();
+            try {
+                isListening = false;
+                if (nativeStopTimer) {
+                    clearTimeout(nativeStopTimer);
+                    nativeStopTimer = null;
+                }
+                if (nativeHardStopTimer) {
+                    clearTimeout(nativeHardStopTimer);
+                    nativeHardStopTimer = null;
+                }
+                try {
+                    if (plugin && plugin.stop) {
+                        // Do not await; some Android devices hang on stop().
+                        Promise.resolve(plugin.stop()).catch((e) => console.error('plugin.stop error', e));
+                    }
+                } catch (e) {
+                    console.error('plugin.stop outer error', e);
+                }
+                if (capacitorSpeechListener && capacitorSpeechListener.remove) {
+                    try { capacitorSpeechListener.remove(); } catch (e) {}
+                    capacitorSpeechListener = null;
+                }
+                if (capacitorResultListener && capacitorResultListener.remove) {
+                    try { capacitorResultListener.remove(); } catch (e) {}
+                    capacitorResultListener = null;
+                }
+            } finally {
+                if (micBtn) micBtn.classList.remove('border-emerald-400', 'bg-emerald-500/10', 'text-white');
+                if (indicator) indicator.classList.add('hidden');
+                if (send && input) {
+                    if (!input.value.trim() && nativeTranscript) {
+                        input.value = nativeTranscript;
+                    }
+                    if (input.value.trim()) {
+                        console.log('Sending via native stop, transcript=', input.value);
+                        sendMessage();
+                    }
+                }
             }
         }
 
