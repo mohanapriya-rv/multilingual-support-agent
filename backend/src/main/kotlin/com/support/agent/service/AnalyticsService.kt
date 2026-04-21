@@ -39,10 +39,22 @@ class AnalyticsService(
         )
         
         try {
-            analyticsRepository.save(event)
-            logger.debug("Analytics event tracked for user: $userId, intent: $intentCategory")
+            val saved = analyticsRepository.save(event)
+            logger.info("Analytics event tracked: id=${saved.id}, user=$userId, session=$sessionId, intent=$intentCategory, language=$language")
         } catch (e: Exception) {
-            logger.error("Failed to track analytics event: ${e.message}")
+            logger.error("ANALYTICS INSERT FAILED for user=$userId, session=$sessionId, intent=$intentCategory: ${e.message}", e)
+        }
+    }
+
+    fun verifyAnalyticsTable(): Map<String, Any> {
+        return try {
+            val count = analyticsRepository.count()
+            val result = mapOf<String, Any>("tableExists" to true, "totalRecords" to count)
+            logger.info("Analytics table verification: $result")
+            result
+        } catch (e: Exception) {
+            logger.error("Analytics table verification FAILED: ${e.message}", e)
+            mapOf("tableExists" to false, "error" to (e.message ?: "unknown"))
         }
     }
 

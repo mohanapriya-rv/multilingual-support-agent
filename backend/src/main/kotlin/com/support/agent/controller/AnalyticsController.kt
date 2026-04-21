@@ -12,14 +12,19 @@ import java.time.LocalDate
 class AnalyticsController(
     private val analyticsService: AnalyticsService
 ) {
+    private val logger = org.slf4j.LoggerFactory.getLogger(AnalyticsController::class.java)
+
     @GetMapping("/dashboard")
     fun getDashboardStats(
         @RequestParam(required = false) startDate: String?,
         @RequestParam(required = false) endDate: String?
     ): ResponseEntity<DashboardStats> {
+        logger.info("Dashboard request: startDate=$startDate, endDate=$endDate")
         val start = startDate?.let { LocalDate.parse(it) }
         val end = endDate?.let { LocalDate.parse(it) }
-        return ResponseEntity.ok(analyticsService.getDashboardStats(start, end))
+        val stats = analyticsService.getDashboardStats(start, end)
+        logger.info("Dashboard response: totalQueries=${stats.totalQueries}, allTimeQueries=${stats.allTimeQueries}, totalConversations=${stats.totalConversations}")
+        return ResponseEntity.ok(stats)
     }
 
     @GetMapping("/daily-report")
@@ -35,5 +40,10 @@ class AnalyticsController(
     @GetMapping("/intent-distribution")
     fun getIntentDistribution(): ResponseEntity<Map<String, Long>> {
         return ResponseEntity.ok(analyticsService.getIntentDistribution())
+    }
+
+    @GetMapping("/verify")
+    fun verifyAnalytics(): ResponseEntity<Map<String, Any>> {
+        return ResponseEntity.ok(analyticsService.verifyAnalyticsTable())
     }
 }

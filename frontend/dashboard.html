@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nira Analytics Dashboard</title>
+    <title>Zivra Analytics Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Nira Analytics Dashboard
+                    Zivra Analytics Dashboard
                 </h1>
                 <p class="text-[var(--text-secondary)] mt-1">Real-time insights for your support agent</p>
                 <p id="dateRange" class="text-sm text-purple-400 mt-1"></p>
@@ -225,7 +225,9 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:8080/api';
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8080/api'
+            : window.location.origin.replace('support-agent-ui', 'support-agent-api').replace(/:\d+$/, '') + '/api';
         let languageChart = null;
         let intentChart = null;
         let escalationIntentChart = null;

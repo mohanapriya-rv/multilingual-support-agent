@@ -157,3 +157,55 @@ INSERT INTO escalations (user_id, original_query, detected_language, escalation_
 ('USR029', 'నా రీఫండ్ రాలేదు, 3 వారాలు అయింది', 'telugu', 'Refund delayed beyond SLA', '[{"role":"user","content":"నా రీఫండ్ రాలేదు, 3 వారాలు అయింది"}]', 'resolved', 'Agent_Srinivas', '2024-01-15 11:00:00'),
 ('USR039', 'ನನ್ನ ಖಾತೆ block ಆಗಿದೆ, ಯಾಕೆ?', 'kannada', 'Account blocked - customer dispute', '[{"role":"user","content":"ನನ್ನ ಖಾತೆ block ಆಗಿದೆ, ಯಾಕೆ?"}]', 'open', 'Agent_Deepak', '2024-01-23 16:45:00'),
 ('USR049', 'Someone accessed my account from another country', 'english', 'Suspicious login detected - international access', '[{"role":"user","content":"Someone accessed my account from another country"}]', 'in_progress', 'Agent_John', '2024-01-20 09:30:00');
+
+-- =============================================
+-- ANALYTICS EVENTS (Sample data for dashboard)
+-- Uses NOW() with offsets so data is always recent
+-- =============================================
+INSERT INTO analytics_events (user_id, session_id, language, input_type, intent_category, intent_type, response_given, escalated, confidence, timestamp) VALUES
+-- Today's events
+('USR001', 'sess_today_001', 'hindi', 'text', 'kyc', 'kyc_status', true, false, 0.95, NOW() - INTERVAL '1 hour'),
+('USR002', 'sess_today_002', 'hindi', 'text', 'transaction', 'transaction_status', true, false, 0.88, NOW() - INTERVAL '2 hours'),
+('USR011', 'sess_today_003', 'tamil', 'text', 'mutual_fund', 'fund_info', true, false, 0.92, NOW() - INTERVAL '3 hours'),
+('USR021', 'sess_today_004', 'telugu', 'text', 'kyc', 'kyc_documents', true, false, 0.90, NOW() - INTERVAL '4 hours'),
+('USR031', 'sess_today_005', 'kannada', 'text', 'account', 'account_status', true, false, 0.85, NOW() - INTERVAL '5 hours'),
+('USR041', 'sess_today_006', 'english', 'text', 'transaction', 'payment_failed', true, false, 0.91, NOW() - INTERVAL '6 hours'),
+('USR003', 'sess_today_007', 'hindi', 'text', 'mutual_fund', 'sip_info', true, false, 0.87, NOW() - INTERVAL '7 hours'),
+('USR012', 'sess_today_008', 'tamil', 'text', 'kyc', 'kyc_status', true, true, 0.45, NOW() - INTERVAL '8 hours'),
+('USR005', 'sess_today_009', 'hindi', 'voice', 'transaction', 'refund_status', true, false, 0.93, NOW() - INTERVAL '9 hours'),
+('USR022', 'sess_today_010', 'telugu', 'text', 'account', 'account_blocked', true, true, 0.40, NOW() - INTERVAL '10 hours'),
+
+-- Yesterday's events
+('USR001', 'sess_yest_001', 'hindi', 'text', 'mutual_fund', 'portfolio_view', true, false, 0.96, NOW() - INTERVAL '1 day' - INTERVAL '2 hours'),
+('USR014', 'sess_yest_002', 'tamil', 'text', 'kyc', 'kyc_status', true, false, 0.89, NOW() - INTERVAL '1 day' - INTERVAL '3 hours'),
+('USR025', 'sess_yest_003', 'telugu', 'text', 'transaction', 'transaction_history', true, false, 0.91, NOW() - INTERVAL '1 day' - INTERVAL '4 hours'),
+('USR032', 'sess_yest_004', 'kannada', 'voice', 'mutual_fund', 'sip_info', true, false, 0.84, NOW() - INTERVAL '1 day' - INTERVAL '5 hours'),
+('USR042', 'sess_yest_005', 'english', 'text', 'account', 'update_details', true, false, 0.88, NOW() - INTERVAL '1 day' - INTERVAL '6 hours'),
+('USR006', 'sess_yest_006', 'hindi', 'text', 'kyc', 'kyc_documents', true, false, 0.92, NOW() - INTERVAL '1 day' - INTERVAL '7 hours'),
+('USR015', 'sess_yest_007', 'tamil', 'text', 'transaction', 'payment_failed', true, true, 0.38, NOW() - INTERVAL '1 day' - INTERVAL '8 hours'),
+('USR035', 'sess_yest_008', 'kannada', 'text', 'mutual_fund', 'fund_info', true, false, 0.90, NOW() - INTERVAL '1 day' - INTERVAL '9 hours'),
+
+-- 2 days ago
+('USR001', 'sess_2d_001', 'hindi', 'text', 'transaction', 'refund_status', true, false, 0.94, NOW() - INTERVAL '2 days' - INTERVAL '1 hour'),
+('USR011', 'sess_2d_002', 'tamil', 'voice', 'kyc', 'kyc_status', true, false, 0.87, NOW() - INTERVAL '2 days' - INTERVAL '3 hours'),
+('USR021', 'sess_2d_003', 'telugu', 'text', 'mutual_fund', 'portfolio_view', true, false, 0.91, NOW() - INTERVAL '2 days' - INTERVAL '5 hours'),
+('USR041', 'sess_2d_004', 'english', 'text', 'account', 'account_status', true, false, 0.86, NOW() - INTERVAL '2 days' - INTERVAL '7 hours'),
+('USR007', 'sess_2d_005', 'hindi', 'text', 'account', 'account_blocked', true, true, 0.35, NOW() - INTERVAL '2 days' - INTERVAL '9 hours'),
+('USR031', 'sess_2d_006', 'kannada', 'text', 'transaction', 'transaction_status', true, false, 0.89, NOW() - INTERVAL '2 days' - INTERVAL '11 hours'),
+
+-- 3 days ago
+('USR002', 'sess_3d_001', 'hindi', 'text', 'mutual_fund', 'sip_info', true, false, 0.93, NOW() - INTERVAL '3 days' - INTERVAL '2 hours'),
+('USR012', 'sess_3d_002', 'tamil', 'text', 'transaction', 'payment_failed', true, false, 0.85, NOW() - INTERVAL '3 days' - INTERVAL '4 hours'),
+('USR022', 'sess_3d_003', 'telugu', 'text', 'kyc', 'kyc_documents', true, false, 0.90, NOW() - INTERVAL '3 days' - INTERVAL '6 hours'),
+('USR042', 'sess_3d_004', 'english', 'voice', 'mutual_fund', 'fund_info', true, false, 0.88, NOW() - INTERVAL '3 days' - INTERVAL '8 hours'),
+('USR032', 'sess_3d_005', 'kannada', 'text', 'account', 'update_details', true, false, 0.86, NOW() - INTERVAL '3 days' - INTERVAL '10 hours'),
+
+-- 4-7 days ago (spread across the week)
+('USR005', 'sess_4d_001', 'hindi', 'text', 'kyc', 'kyc_status', true, false, 0.95, NOW() - INTERVAL '4 days' - INTERVAL '3 hours'),
+('USR014', 'sess_4d_002', 'tamil', 'text', 'mutual_fund', 'portfolio_view', true, false, 0.91, NOW() - INTERVAL '4 days' - INTERVAL '6 hours'),
+('USR025', 'sess_5d_001', 'telugu', 'text', 'transaction', 'refund_status', true, false, 0.87, NOW() - INTERVAL '5 days' - INTERVAL '2 hours'),
+('USR035', 'sess_5d_002', 'kannada', 'text', 'kyc', 'kyc_status', true, false, 0.92, NOW() - INTERVAL '5 days' - INTERVAL '8 hours'),
+('USR045', 'sess_6d_001', 'english', 'text', 'account', 'account_status', true, false, 0.89, NOW() - INTERVAL '6 days' - INTERVAL '4 hours'),
+('USR008', 'sess_6d_002', 'hindi', 'voice', 'transaction', 'transaction_history', true, true, 0.42, NOW() - INTERVAL '6 days' - INTERVAL '10 hours'),
+('USR019', 'sess_7d_001', 'tamil', 'text', 'mutual_fund', 'sip_info', true, false, 0.88, NOW() - INTERVAL '7 days' - INTERVAL '5 hours'),
+('USR027', 'sess_7d_002', 'telugu', 'text', 'kyc', 'kyc_documents', true, false, 0.90, NOW() - INTERVAL '7 days' - INTERVAL '9 hours');

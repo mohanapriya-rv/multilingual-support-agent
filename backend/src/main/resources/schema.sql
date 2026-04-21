@@ -50,6 +50,21 @@ CREATE TABLE IF NOT EXISTS escalations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Analytics Events table
+CREATE TABLE IF NOT EXISTS analytics_events (
+    id BIGSERIAL PRIMARY KEY,
+    user_id VARCHAR(50) NOT NULL,
+    session_id VARCHAR(100) NOT NULL,
+    language VARCHAR(30),
+    input_type VARCHAR(20),
+    intent_category VARCHAR(50),
+    intent_type VARCHAR(50),
+    response_given BOOLEAN DEFAULT TRUE,
+    escalated BOOLEAN DEFAULT FALSE,
+    confidence DOUBLE PRECISION DEFAULT 0.0,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_kyc_user_id ON kyc_records(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
@@ -57,3 +72,8 @@ CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status);
 CREATE INDEX IF NOT EXISTS idx_escalations_status ON escalations(status);
 CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON analytics_events(timestamp);
+CREATE INDEX IF NOT EXISTS idx_analytics_session_id ON analytics_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_language ON analytics_events(language);
+CREATE INDEX IF NOT EXISTS idx_analytics_intent ON analytics_events(intent_category);
