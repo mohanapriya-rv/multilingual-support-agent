@@ -48,12 +48,12 @@ class AnalyticsService(
 
     fun getDashboardStats(startDate: LocalDate? = null, endDate: LocalDate? = null): DashboardStats {
         val today = LocalDate.now()
-        val start = startDate?.atStartOfDay() ?: today.atStartOfDay()
+        val start = startDate?.atStartOfDay() ?: today.minusDays(7).atStartOfDay()
         val end = endDate?.plusDays(1)?.atStartOfDay() ?: today.plusDays(1).atStartOfDay()
-        
+
         val dateRangeEvents = analyticsRepository.findByTimestampBetween(start, end)
         val escalatedEvents = dateRangeEvents.filter { it.escalated }
-        
+
         return DashboardStats(
             totalConversations = dateRangeEvents.map { it.sessionId }.distinct().size.toLong(),
             totalQueries = dateRangeEvents.size.toLong(),
@@ -69,7 +69,7 @@ class AnalyticsService(
             inputTypeDistribution = getInputTypeDistribution(dateRangeEvents),
             intentDistribution = getIntentDistribution(dateRangeEvents),
             successRate = calculateSuccessRate(dateRangeEvents),
-            startDate = startDate ?: today,
+            startDate = startDate ?: today.minusDays(7),
             endDate = endDate ?: today
         )
     }
