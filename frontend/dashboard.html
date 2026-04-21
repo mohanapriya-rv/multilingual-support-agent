@@ -227,7 +227,7 @@
     <script>
         const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8080/api'
-            : window.location.origin.replace('support-agent-ui', 'support-agent-api').replace(/:\d+$/, '') + '/api';
+            : 'https://multilingual-support-agent.onrender.com/api';
         let languageChart = null;
         let intentChart = null;
         let escalationIntentChart = null;
