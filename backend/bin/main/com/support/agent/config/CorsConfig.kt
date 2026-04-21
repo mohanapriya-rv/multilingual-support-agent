@@ -12,11 +12,8 @@ class CorsConfig {
     @Bean
     fun corsFilter(): CorsFilter {
         val config = CorsConfiguration().apply {
-            allowCredentials = true
-            addAllowedOrigin("https://multilingual-support-agent-1.onrender.com")
-            addAllowedOrigin("https://multilingual-support-agent.onrender.com")
-            addAllowedOrigin("http://localhost:3000")
-            addAllowedOrigin("http://localhost:3001")
+            allowCredentials = false
+            addAllowedOriginPattern("*")
             addAllowedHeader("*")
             addAllowedMethod("*")
             addExposedHeader("*")

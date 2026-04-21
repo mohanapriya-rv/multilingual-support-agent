@@ -66,37 +66,36 @@ INSERT INTO users (id, name, email, phone, account_status, block_reason, balance
 ('USR047', 'Robert Brown', 'robert.b@email.com', '9912345684', 'active', NULL, 12000.00, 'english', '2023-09-02 15:45:00'),
 ('USR048', 'Amanda Lee', 'amanda.lee@email.com', '9912345685', 'active', NULL, 78900.00, 'english', '2023-06-30 10:15:00'),
 ('USR049', 'Christopher Martin', 'chris.m@email.com', '9912345686', 'blocked', 'Account compromised', 0.00, 'english', '2023-02-14 12:30:00'),
-('USR050', 'Jessica Davis', 'jessica.d@email.com', '9912345687', 'active', NULL, 41200.00, 'english', '2023-08-20 08:00:00')
+('USR050', 'Jessica Davis', 'jessica.d@email.com', '9912345687', 'active', NULL, 41200.00, 'english', '2023-08-20 08:00:00'),
+('USR_KYC_PENDING', 'KYC Pending User', 'kyc.pending@email.com', '9912345688', 'active', NULL, 25000.00, 'tamil', '2023-09-15 10:00:00'),
+('USR_KYC_REJECTED', 'KYC Rejected User', 'kyc.rejected@email.com', '9912345689', 'active', NULL, 35000.00, 'tamil', '2023-09-20 11:30:00'),
+('USR_KYC_MISMATCH', 'Name Mismatch User', 'name.mismatch@email.com', '9912345690', 'active', NULL, 50000.00, 'tamil', '2023-09-25 14:00:00')
 ON CONFLICT (id) DO NOTHING;
 
 -- =============================================
 -- KYC RECORDS
 -- =============================================
 INSERT INTO kyc_records (user_id, status, documents_submitted, pending_documents, rejection_reason, last_updated) VALUES
+-- USR001 - KYC timeline progression
+('USR001', 'pending', 'aadhaar', 'pan,address_proof', NULL, '2023-06-01 10:00:00'),
+('USR001', 'pending', 'aadhaar,pan', 'address_proof', NULL, '2023-06-05 14:30:00'),
 ('USR001', 'verified', 'aadhaar,pan,address_proof', NULL, NULL, '2023-07-01 11:00:00'),
+
+-- USR002 - KYC timeline progression
+('USR002', 'pending', 'pan', 'aadhaar,voter_id', NULL, '2023-08-15 09:00:00'),
+('USR002', 'pending', 'pan,aadhaar', 'voter_id', NULL, '2023-08-20 11:30:00'),
 ('USR002', 'verified', 'aadhaar,pan,voter_id', NULL, NULL, '2023-09-01 10:30:00'),
+
+-- USR003 - KYC timeline progression with rejection then approval
+('USR003', 'pending', 'aadhaar', 'pan,passport', NULL, '2023-04-10 10:00:00'),
+('USR003', 'rejected', 'aadhaar,pan', NULL, 'PAN card image unclear, please resubmit', '2023-04-15 14:00:00'),
+('USR003', 'pending', 'aadhaar,pan', 'passport', NULL, '2023-04-20 11:30:00'),
 ('USR003', 'verified', 'aadhaar,pan,passport', NULL, NULL, '2023-05-15 14:00:00'),
-('USR004', 'pending', 'aadhaar,pan', 'address_proof', NULL, '2023-08-10 09:00:00'),
-('USR005', 'verified', 'aadhaar,pan,driving_license', NULL, NULL, '2023-04-20 16:30:00'),
-('USR006', 'pending', 'aadhaar', 'pan,address_proof', NULL, '2023-09-25 11:15:00'),
-('USR007', 'rejected', 'aadhaar,pan', NULL, 'PAN card image unclear, please resubmit', '2023-03-01 13:45:00'),
-('USR008', 'verified', 'aadhaar,pan,voter_id', NULL, NULL, '2023-10-10 10:00:00'),
-('USR009', 'verified', 'aadhaar,pan,address_proof', NULL, NULL, '2023-06-05 15:30:00'),
-('USR010', 'pending', 'aadhaar,pan', 'selfie_verification', NULL, '2023-08-20 12:00:00'),
-('USR011', 'verified', 'aadhaar,pan,address_proof', NULL, NULL, '2023-07-10 09:30:00'),
-('USR012', 'verified', 'aadhaar,pan,driving_license', NULL, NULL, '2023-08-05 14:15:00'),
-('USR013', 'expired', 'aadhaar,pan', 'updated_address_proof', 'Address proof older than 3 months', '2023-05-10 11:00:00'),
-('USR014', 'verified', 'aadhaar,pan,passport', NULL, NULL, '2023-09-15 16:45:00'),
-('USR015', 'pending', 'aadhaar', 'pan,address_proof', NULL, '2023-09-20 10:30:00'),
-('USR021', 'verified', 'aadhaar,pan,voter_id', NULL, NULL, '2023-06-01 09:00:00'),
-('USR022', 'verified', 'aadhaar,pan,address_proof', NULL, NULL, '2023-07-05 14:30:00'),
-('USR024', 'pending', 'aadhaar,pan', 'address_proof', 'Address verification pending', '2023-05-01 11:45:00'),
-('USR031', 'verified', 'aadhaar,pan,driving_license', NULL, NULL, '2023-05-15 09:15:00'),
-('USR032', 'verified', 'aadhaar,pan,passport', NULL, NULL, '2023-06-20 14:00:00'),
-('USR033', 'pending', 'aadhaar,pan', 'video_kyc', NULL, '2023-07-01 10:45:00'),
-('USR041', 'verified', 'passport,pan,address_proof', NULL, NULL, '2023-04-15 13:30:00'),
-('USR042', 'verified', 'aadhaar,pan,voter_id', NULL, NULL, '2023-05-25 16:00:00'),
-('USR044', 'pending', 'aadhaar,pan', 'bank_statement', NULL, '2023-07-10 11:30:00');
+
+-- Test users for various KYC scenarios
+('USR_KYC_PENDING', 'pending', 'aadhaar', 'pan,address_proof,photo', NULL, '2023-09-15 10:00:00'),
+('USR_KYC_REJECTED', 'rejected', 'aadhaar,pan', NULL, 'PAN card image unclear, please resubmit', '2023-09-20 11:30:00'),
+('USR_KYC_MISMATCH', 'rejected', 'aadhaar,pan', NULL, 'Name mismatch on PAN card', '2023-09-25 14:00:00');
 
 -- =============================================
 -- TRANSACTIONS (Sample transactions for various scenarios)

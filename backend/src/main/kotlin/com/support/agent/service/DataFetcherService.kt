@@ -196,7 +196,7 @@ class DataFetcherService(
     private fun fetchKycData(userId: String, intent: ExtractedIntent): Map<String, Any> {
         val kyc = kycRepository.findByUserId(userId)
         val user = userRepository.findById(userId).orElse(null)
-        
+
         if (kyc == null) {
             return mapOf("kyc_status" to "Not found", "message" to "No KYC record exists for this user")
         }
@@ -208,7 +208,12 @@ class DataFetcherService(
             if (kyc.rejectionReason != null) {
                 put("rejection_reason", kyc.rejectionReason)
             }
-            put("last_updated", kyc.lastUpdated.format(dateFormatter))
+            try {
+                put("last_updated", kyc.lastUpdated.format(dateFormatter))
+            } catch (e: Exception) {
+                logger.error("Error formatting last_updated date", e)
+                put("last_updated", kyc.lastUpdated.toString())
+            }
             user?.let { put("user_name", it.name) }
         }
     }
