@@ -3,7 +3,11 @@
   "appName": "Zivra",
   "webDir": "www",
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "allowNavigation": [
+      "multilingual-support-agent.onrender.com",
+      "*.onrender.com"
+    ]
   },
   "plugins": {
     "SpeechRecognition": {

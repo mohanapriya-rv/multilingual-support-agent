@@ -325,9 +325,16 @@
 
     <script>
         // Auto-detect API URL: use environment or fallback to localhost
-        const API_BASE = window.location.hostname === 'localhost'
-            ? 'http://localhost:8080/api'
-            : (window.API_URL || 'https://multilingual-support-agent.onrender.com/api');
+        // Capacitor native: Android uses https://localhost, iOS uses capacitor://localhost
+        const isNativeApp = (window.location.protocol === 'capacitor:') ||
+            (window.location.protocol === 'https:' && window.location.hostname === 'localhost' && !window.location.port) ||
+            (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+        const API_BASE = isNativeApp
+            ? (window.API_URL || 'https://multilingual-support-agent.onrender.com/api')
+            : (window.location.hostname === 'localhost'
+                ? 'http://localhost:8080/api'
+                : (window.API_URL || 'https://multilingual-support-agent.onrender.com/api'));
+        console.log('[Zivra] isNativeApp:', isNativeApp, 'API_BASE:', API_BASE, 'protocol:', window.location.protocol, 'hostname:', window.location.hostname);
         let conversationHistory = [];
         let sessionId = 'sess_' + Math.random().toString(36).substr(2, 9);
         let hasConversationStarted = false;
@@ -653,6 +660,7 @@
             showTypingIndicator();
 
             try {
+                console.log('[Zivra] Sending to:', `${API_BASE}/chat`, { userId, message, sessionId });
                 const response = await fetch(`${API_BASE}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -664,6 +672,13 @@
                         inputType: currentInputType || 'text'
                     })
                 });
+
+                console.log('[Zivra] Response status:', response.status);
+                if (!response.ok) {
+                    const errText = await response.text();
+                    console.error('[Zivra] Backend error:', response.status, errText);
+                    throw new Error(`Backend returned ${response.status}: ${errText}`);
+                }
 
                 const data = await response.json();
                 hideTypingIndicator();
